@@ -75,6 +75,9 @@
 }
 .filtroBtn:hover     { border-color: var(--gold); color: var(--gold); }
 .filtroBtnAtivo      { background: var(--gold); border-color: var(--gold); color: var(--white) !important; }
+.filtroBtnGold       { border-color: var(--border-gold); color: var(--gold); }
+.filtroBtnGold:hover { background: var(--gold-dim); }
+.filtroBtnAtivoGold  { background: var(--gold); border-color: var(--gold); color: var(--white) !important; }
 
 .filtroInput {
   background: var(--surface2);

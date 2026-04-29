@@ -16,6 +16,7 @@ interface Props {
 export default function LeadForm({ imovelId, imovelTitulo, origem, onSuccess, compact }: Props) {
   const router = useRouter()
   const [form,  setForm]  = useState({ nome: '', telefone: '', email: '', mensagem: '' })
+  const [optIn, setOptIn] = useState(false)
   const [busy,  setBusy]  = useState(false)
   const [error, setError] = useState('')
 
@@ -42,6 +43,13 @@ export default function LeadForm({ imovelId, imovelTitulo, origem, onSuccess, co
     })
 
     if (err) { setError('Erro ao enviar. Tente novamente.'); setBusy(false); return }
+
+    if (optIn && form.email) {
+      await supabase.from('newsletter_subscribers').upsert(
+        { email: form.email, nome: form.nome || null, confirmado: true, confirmado_at: new Date().toISOString(), opt_in_origem: origem },
+        { onConflict: 'email', ignoreDuplicates: true }
+      )
+    }
 
     if (onSuccess) onSuccess()
     else router.push('/obrigado')
@@ -81,6 +89,16 @@ export default function LeadForm({ imovelId, imovelTitulo, origem, onSuccess, co
           rows={3}
         />
       )}
+
+      <label className={styles.optIn}>
+        <input
+          type="checkbox"
+          checked={optIn}
+          onChange={e => setOptIn(e.target.checked)}
+          className={styles.optInCheck}
+        />
+        <span>Quero receber novidades e ofertas imobiliárias de Carlos Fondelo</span>
+      </label>
 
       <button type="submit" className={styles.btn} disabled={busy}>
         {busy ? 'Enviando…' : 'Quero ser contatado'}

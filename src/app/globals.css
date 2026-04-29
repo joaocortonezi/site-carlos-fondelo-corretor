@@ -1,19 +1,19 @@
 :root {
   /* ── Backgrounds ── */
-  --bg:             #080808;
-  --surface:        #111111;
-  --surface2:       #181818;
-  --surface3:       #1f1f1f;
-  --card:           #151515;
-  --dropdown-bg:    #1c1c1c;
-  --nav-bg-mobile:    rgba(8, 8, 8, 0.98);
-  --nav-bg-scrolled:  rgba(8, 8, 8, 0.96);
-  --logo-filter:      brightness(0) invert(1);
+  --bg:             #f9f8f4;
+  --surface:        #ffffff;
+  --surface2:       #f3f2ee;
+  --surface3:       #edecea;
+  --card:           #ffffff;
+  --dropdown-bg:    #ffffff;
+  --nav-bg-mobile:    rgba(249, 248, 244, 0.98);
+  --nav-bg-scrolled:  rgba(255, 255, 255, 0.97);
+  --logo-filter:      brightness(0);
 
   /* ── Text ── */
-  --text:           #f0ebe2;
-  --text-muted:     #8a7d6b;
-  --text-soft:      #c0b8ac;
+  --text:           #1c1b18;
+  --text-muted:     #7a7265;
+  --text-soft:      #4d4840;
   --white:          #ffffff;
   --white-80:       rgba(255, 255, 255, 0.80);
   --white-60:       rgba(255, 255, 255, 0.60);
@@ -37,7 +37,7 @@
   --tag-aluguel:    #1a3a5c;
 
   /* ── Bordas ── */
-  --border:         rgba(255, 255, 255, 0.08);
+  --border:         rgba(0, 0, 0, 0.09);
   --border-gold:    rgba(188, 105, 6, 0.30);
 
   /* ── Overlays sobre imagens ── */
@@ -61,7 +61,7 @@
   /* ── Layout ── */
   --radius:         4px;
   --nav-height:     68px;
-  --font-display:   'Cormorant Garamond', serif;
+  --font-display:   var(--font-body);
   --font-body:      'DM Sans', sans-serif;
 
   /* ── Admin ── */

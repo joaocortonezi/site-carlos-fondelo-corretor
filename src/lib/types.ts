@@ -1,5 +1,5 @@
 export type ImovelTipo      = 'apartamento' | 'casa' | 'terreno' | 'comercial'
-export type ImovelFinalidade = 'venda' | 'aluguel'
+export type ImovelFinalidade = 'venda' | 'aluguel' | 'ambos'
 export type ImovelStatus    = 'disponivel' | 'vendido' | 'alugado'
 export type ImovelSituacao  = 'construcao' | 'novo' | 'planta' | 'usado'
 

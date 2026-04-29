@@ -20,8 +20,8 @@ const SITUACAO_OPTIONS: MSOption[] = [
 ]
 
 const FINALIDADES = [
-  { label: 'Venda',   value: 'venda' },
-  { label: 'Aluguel', value: 'aluguel' },
+  { label: 'Venda',   value: 'venda'   },
+  { label: 'Locação', value: 'aluguel' },
 ]
 
 const QUARTOS_LIST = [
@@ -99,6 +99,18 @@ export default function ImovelFiltros({ bairros }: Props) {
                 {f.label}
               </button>
             ))}
+          </div>
+        </div>
+
+        <div className={styles.filtroGroup}>
+          <span className={styles.filtroLabel}>Exclusivos</span>
+          <div className={styles.filtroOpcoes}>
+            <button
+              className={`${styles.filtroBtn} ${styles.filtroBtnGold} ${isActive('exclusivo', 'true') ? styles.filtroBtnAtivoGold : ''}`}
+              onClick={() => setParam('exclusivo', isActive('exclusivo', 'true') ? '' : 'true')}
+            >
+              ★ Só exclusivos
+            </button>
           </div>
         </div>
 

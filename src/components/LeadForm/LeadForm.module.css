@@ -38,6 +38,22 @@
 .btn:hover    { background: var(--gold-light); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+.optIn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.optInCheck {
+  margin-top: 2px;
+  accent-color: var(--gold);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
 .error {
   font-size:    0.78rem;
   color:        var(--form-error-text);

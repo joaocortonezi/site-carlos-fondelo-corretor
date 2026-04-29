@@ -7,6 +7,8 @@ import Reviews               from '@/components/Reviews/Reviews'
 import HighEnd               from '@/components/HighEnd/HighEnd'
 import Destaques             from '@/components/Destaques/Destaques'
 import About                 from '@/components/About/About'
+import CaptacaoSection       from '@/components/CaptacaoSection/CaptacaoSection'
+import NewsletterSection     from '@/components/NewsletterSection/NewsletterSection'
 import Footer                from '@/components/Footer/Footer'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { PerfilCorretor }    from '@/lib/types'
@@ -86,7 +88,9 @@ export default async function Home() {
       <ExclusiveProperties imoveis={exclusivos ?? []} />
       <Reviews avaliacoes={avaliacoesData ?? []} />
       <HighEnd imoveis={altopadrao ?? []} />
+      <CaptacaoSection telefone={(perfilData as PerfilCorretor | null)?.telefone} />
       <About perfil={perfilData as PerfilCorretor | null} />
+      <NewsletterSection />
       <Footer perfil={perfilData as PerfilCorretor | null} />
     </>
   )

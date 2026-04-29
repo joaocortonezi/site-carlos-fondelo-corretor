@@ -10,7 +10,6 @@ import styles                          from './form.module.css'
 interface Props { imovel?: Imovel }
 
 const TIPOS       = ['apartamento', 'casa', 'terreno', 'comercial'] as const
-const FINALIDADES = ['venda', 'aluguel'] as const
 const STATUS_LIST = ['disponivel', 'vendido', 'alugado'] as const
 const SITUACOES   = [
   { value: 'construcao', label: 'Construção' },
@@ -57,10 +56,20 @@ export default function ImovelForm({ imovel }: Props) {
   const isEdit = !!imovel
   const router = useRouter()
 
+  const paraVenda   = imovel?.finalidade === 'venda'   || imovel?.finalidade === 'ambos'
+  const paraLocacao = imovel?.finalidade === 'aluguel' || imovel?.finalidade === 'ambos'
+  const [finalidadeVenda,   setFinalidadeVenda]   = useState(isEdit ? paraVenda   : true)
+  const [finalidadeLocacao, setFinalidadeLocacao] = useState(isEdit ? paraLocacao : false)
+
+  const getFinalidade = () => {
+    if (finalidadeVenda && finalidadeLocacao) return 'ambos'
+    if (finalidadeLocacao) return 'aluguel'
+    return 'venda'
+  }
+
   const [form, setForm] = useState({
     titulo:     imovel?.titulo     ?? '',
     tipo:       imovel?.tipo       ?? 'apartamento',
-    finalidade: imovel?.finalidade ?? 'venda',
     status:     imovel?.status     ?? 'disponivel',
     referencia: imovel?.referencia ?? '',
     destaque:    imovel?.destaque    ?? false,
@@ -247,7 +256,7 @@ export default function ImovelForm({ imovel }: Props) {
     const payload = {
       titulo:     form.titulo,
       tipo:       form.tipo,
-      finalidade: form.finalidade,
+      finalidade: getFinalidade(),
       status:     form.status,
       referencia: form.referencia  || null,
       destaque:    form.destaque,
@@ -371,9 +380,16 @@ export default function ImovelForm({ imovel }: Props) {
             </select>
           </Field>
           <Field label="Finalidade *">
-            <select className={styles.select} value={form.finalidade} onChange={e => set('finalidade', e.target.value)}>
-              {FINALIDADES.map(f => <option key={f} value={f}>{f.charAt(0).toUpperCase() + f.slice(1)}</option>)}
-            </select>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', paddingTop: '0.4rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                <input type="checkbox" checked={finalidadeVenda} onChange={e => setFinalidadeVenda(e.target.checked)} style={{ accentColor: 'var(--gold)' }} />
+                Para Venda
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                <input type="checkbox" checked={finalidadeLocacao} onChange={e => setFinalidadeLocacao(e.target.checked)} style={{ accentColor: 'var(--gold)' }} />
+                Para Locação
+              </label>
+            </div>
           </Field>
           <Field label="Status *">
             <select className={styles.select} value={form.status} onChange={e => set('status', e.target.value)}>

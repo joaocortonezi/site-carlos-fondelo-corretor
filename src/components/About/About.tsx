@@ -83,7 +83,6 @@ export default function About({ perfil }: Props) {
                 sizes="220px"
                 className={styles.photo}
               />
-              <div className={styles.photoLabel}>Foto oficial</div>
             </div>
           </motion.div>
 

@@ -42,7 +42,7 @@ export default async function ImoveisPage({ searchParams }: PageProps) {
     else if (tipos.length > 1) query = query.in('tipo', tipos)
   }
   if (params.finalidade) {
-    query = query.eq('finalidade', params.finalidade)
+    query = query.in('finalidade', [params.finalidade, 'ambos'])
   }
   if (params.quartos) {
     query = query.gte('quartos', Number(params.quartos))

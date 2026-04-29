@@ -32,24 +32,31 @@ interface Props { bairros?: string[] }
 export default function Search({ bairros = [] }: Props) {
   const router = useRouter()
 
-  const [tipo,     setTipo]     = useState('')
-  const [bairro,   setBairro]   = useState('')
-  const [situacao, setSituacao] = useState('')
-  const [precoMin, setPrecoMin] = useState('')
-  const [precoMax, setPrecoMax] = useState('')
-  const [quartos,  setQuartos]  = useState('')
+  const [finalidade, setFinalidade] = useState('')
+  const [tipo,       setTipo]       = useState('')
+  const [bairro,     setBairro]     = useState('')
+  const [situacao,   setSituacao]   = useState('')
+  const [precoMin,   setPrecoMin]   = useState('')
+  const [precoMax,   setPrecoMax]   = useState('')
+  const [quartos,    setQuartos]    = useState('')
+  const [exclusivo,  setExclusivo]  = useState(false)
 
   const bairroOptions = bairros.map(b => ({ label: b, value: b }))
+
+  const toggleFinalidade = (val: string) =>
+    setFinalidade(prev => prev === val ? '' : val)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const params = new URLSearchParams()
-    if (tipo)     params.set('tipo',      tipo)
-    if (bairro)   params.set('bairro',    bairro)
-    if (situacao) params.set('situacao',  situacao)
-    if (precoMin) params.set('preco_min', precoMin)
-    if (precoMax) params.set('preco_max', precoMax)
-    if (quartos)  params.set('quartos',   quartos)
+    if (finalidade) params.set('finalidade', finalidade)
+    if (tipo)       params.set('tipo',       tipo)
+    if (bairro)     params.set('bairro',     bairro)
+    if (situacao)   params.set('situacao',   situacao)
+    if (precoMin)   params.set('preco_min',  precoMin)
+    if (precoMax)   params.set('preco_max',  precoMax)
+    if (quartos)    params.set('quartos',    quartos)
+    if (exclusivo)  params.set('exclusivo',  'true')
     const qs = params.toString()
     router.push(qs ? `/imoveis?${qs}` : '/imoveis')
   }
@@ -63,6 +70,30 @@ export default function Search({ bairros = [] }: Props) {
     >
       <div className="container">
         <p className={styles.title}>Buscar Imóvel</p>
+
+        {/* Tabs de finalidade */}
+        <div className={styles.finalidadeTabs}>
+          {[
+            { label: 'Locação',  value: 'aluguel' },
+            { label: 'Venda',    value: 'venda'   },
+          ].map(f => (
+            <button
+              key={f.value}
+              type="button"
+              className={`${styles.tab} ${finalidade === f.value ? styles.tabActive : ''}`}
+              onClick={() => toggleFinalidade(f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            className={`${styles.tabExclusivo} ${exclusivo ? styles.tabExclusivoActive : ''}`}
+            onClick={() => setExclusivo(v => !v)}
+          >
+            ★ Exclusivos
+          </button>
+        </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.row1}>

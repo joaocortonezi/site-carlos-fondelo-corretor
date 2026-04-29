@@ -33,9 +33,12 @@ export default function Nav() {
     <>
     <motion.nav
       className={`${styles.nav} ${scrolled ? '' : styles.navTransparent}`}
-      animate={{ backgroundColor: scrolled ? 'rgba(8,8,8,0.96)' : 'rgba(8,8,8,0)' }}
+      animate={{ backgroundColor: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(0,0,0,0)' }}
       transition={{ duration: 0.4 }}
-      style={{ backdropFilter: scrolled ? 'blur(14px)' : 'none' }}
+      style={{
+        backdropFilter: scrolled ? 'blur(14px)' : 'none',
+        boxShadow: scrolled ? '0 1px 20px rgba(0,0,0,0.07)' : 'none',
+      }}
     >
       <div className={styles.inner}>
         {/* Logo */}

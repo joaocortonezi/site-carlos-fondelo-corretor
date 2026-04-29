@@ -19,11 +19,12 @@ export default function Hero({ banners = [], heroConfig }: Props) {
 
   /* Textos dinâmicos do Slide 0 */
   const eyebrow   = heroConfig?.eyebrow   ?? 'Corretor de Imóveis · CRECI 000000'
-  const words     = [
-    heroConfig?.titulo_1  ?? 'O imóvel certo',
-    heroConfig?.titulo_2  ?? 'para cada',
-    heroConfig?.titulo_3  ?? 'história.',
+  const rawWords  = [
+    heroConfig?.titulo_1 ?? 'O imóvel certo',
+    heroConfig?.titulo_2 ?? 'para cada história',
+    heroConfig?.titulo_3 ?? '',
   ]
+  const words = rawWords.filter(w => w.trim() !== '')
   const subtitulo = heroConfig?.subtitulo ?? 'Atendimento personalizado · Compra, venda e locação'
   const slide0Img = heroConfig?.url_imagem || '/images/banner.jpg'
 
@@ -109,7 +110,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
             >
               {words.map((word, i) => (
                 <motion.span key={i} className={styles.titleLine} variants={lineVariants}>
-                  {i === 2 ? <em>{word}</em> : word}
+                  {i === words.length - 1 ? <em>{word}</em> : word}
                 </motion.span>
               ))}
             </motion.h1>
