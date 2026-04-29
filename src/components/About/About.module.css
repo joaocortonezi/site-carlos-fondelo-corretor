@@ -1,0 +1,114 @@
+.section { padding: 5rem 0; }
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2.5rem;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+/* Photo */
+.photoWrap { position: relative; }
+.photoFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.photo {
+  object-fit: cover;
+  filter: saturate(0.75) brightness(0.85);
+}
+.photoLabel {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 0.8rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Content */
+.name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+.creci {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1.2rem;
+}
+.text {
+  font-size: 0.82rem;
+  line-height: 1.85;
+  color: var(--text-soft);
+  margin-bottom: 0.9rem;
+}
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 1.5rem 0 2rem;
+}
+.statItem { text-align: center; }
+.statNum {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 400;
+  color: var(--gold);
+  line-height: 1;
+}
+.statSuffix {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+}
+.statLabel {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
+/* Inline form */
+.formBlock {
+  border-top:  1px solid var(--border);
+  padding-top: 1.5rem;
+  margin-top:  0.5rem;
+}
+.formLabel {
+  font-size:      0.63rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color:          var(--gold);
+  margin-bottom:  1rem;
+}
+
+@media (max-width: 768px) {
+  .inner { grid-template-columns: 1fr; }
+  .photoFrame { max-width: 240px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+}

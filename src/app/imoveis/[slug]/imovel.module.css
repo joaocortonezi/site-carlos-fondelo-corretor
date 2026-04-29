@@ -1,0 +1,208 @@
+.main {
+  min-height: 100vh;
+  padding-top: var(--nav-height);
+  padding-bottom: 5rem;
+  background: var(--bg);
+}
+
+.breadcrumb {
+  padding: 1.5rem 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+.breadcrumb a { transition: color 0.2s; }
+.breadcrumb a:hover { color: var(--gold); }
+.breadcrumb span { color: var(--text-soft); }
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* Main col */
+.col { min-width: 0; }
+
+.infoBlock { margin-top: 2rem; }
+
+.tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.tag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.75rem;
+  border-radius: 2px;
+  color: var(--white);
+}
+.tag_venda    { background: var(--tag-venda); }
+.tag_aluguel  { background: var(--tag-aluguel); }
+.tagTipo      { background: var(--surface3); color: var(--text-soft); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.28rem 0.75rem; border-radius: 2px; }
+.tagDestaque  { background: var(--gold); color: var(--white); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.28rem 0.75rem; border-radius: 2px; }
+
+.titulo {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 0.4rem;
+}
+.location {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+.price {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+
+/* Attrs grid */
+.attrs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.attrItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.75rem;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+.attrItem:last-child { border-right: none; }
+.attrValue {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.attrLabel {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 0.2rem;
+}
+
+/* Sections */
+.secTitle {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+.descricao, .localizacao {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+/* Sidebar CTA */
+.sidebar { position: sticky; top: calc(var(--nav-height) + 1.5rem); }
+
+.ctaCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+}
+.ctaPrice {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 0.25rem;
+}
+.ctaRef {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 1.25rem;
+}
+.ctaName {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.ctaCreci {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+.ctaFormLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.ctaBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.9rem;
+  background: var(--whatsapp);
+  color: var(--white);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 3px;
+  margin-bottom: 0.6rem;
+  transition: background 0.2s;
+}
+.ctaBtn:hover { background: var(--whatsapp-dark); }
+.ctaBtnSecondary {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  transition: border-color 0.2s, color 0.2s;
+}
+.ctaBtnSecondary:hover { border-color: var(--gold); color: var(--gold); }
+
+.videoBlock { margin-bottom: 2rem; }
+.videoPlayer {
+  width: 100%;
+  border-radius: var(--radius);
+  background: var(--surface2);
+  display: block;
+  max-height: 520px;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .attrs  { flex-wrap: wrap; }
+  .attrItem { flex: 1 1 50%; }
+}

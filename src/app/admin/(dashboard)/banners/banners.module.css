@@ -1,0 +1,446 @@
+/* Header */
+.header {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  margin-bottom:   1.5rem;
+  gap:             1rem;
+  flex-wrap:       wrap;
+}
+.title { font-size: 1.4rem; font-weight: 700; color: var(--admin-text); margin-bottom: 0.2rem; }
+.count { font-size: 0.8rem; color: var(--admin-text-3); }
+
+.btnNew {
+  background:    var(--gold);
+  color:         #fff;
+  font-size:     0.8rem;
+  font-weight:   600;
+  padding:       0.55rem 1.2rem;
+  border-radius: 6px;
+  border:        none;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    background 0.15s;
+}
+.btnNew:hover { background: var(--gold-light); }
+
+/* ─── Hero config section ─────────────────────────────────────────────────── */
+
+.heroSection {
+  background:    var(--admin-card);
+  border:        1px solid var(--admin-border-2);
+  border-radius: 10px;
+  padding:       1.5rem;
+  margin-bottom: 2rem;
+  box-shadow:    var(--admin-shadow);
+  border-top:    3px solid var(--gold);
+}
+.heroSectionHeader {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  margin-bottom:   1.25rem;
+  gap:             1rem;
+  flex-wrap:       wrap;
+}
+.heroSectionTitle { font-size: 1rem; font-weight: 700; color: var(--admin-text); margin-bottom: 0.15rem; }
+.heroSectionSub   { font-size: 0.76rem; color: var(--admin-text-3); }
+
+.btnSaveHero {
+  background:    var(--gold);
+  color:         #fff;
+  font-size:     0.8rem;
+  font-weight:   600;
+  padding:       0.5rem 1.25rem;
+  border-radius: 6px;
+  border:        none;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    background 0.15s;
+  min-width:     80px;
+}
+.btnSaveHero:hover    { background: var(--gold-light); }
+.btnSaveHero:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.heroError {
+  background:    var(--form-error-bg);
+  border:        1px solid var(--form-error-border);
+  color:         var(--form-error-text);
+  border-radius: 6px;
+  padding:       0.5rem 0.8rem;
+  font-size:     0.76rem;
+  margin-bottom: 1rem;
+}
+
+.heroBody {
+  display:               grid;
+  grid-template-columns: 280px 1fr;
+  gap:                   1.5rem;
+  align-items:           start;
+}
+
+.heroFieldLabel {
+  font-size:      0.7rem;
+  font-weight:    700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--admin-text-3);
+  margin-bottom:  0.6rem;
+}
+
+/* Image upload */
+.heroImgCol  {}
+.heroUpload {
+  width:         100%;
+  aspect-ratio:  16/7;
+  border:        2px dashed var(--admin-border);
+  border-radius: 8px;
+  cursor:        pointer;
+  overflow:      hidden;
+  position:      relative;
+  transition:    border-color 0.2s;
+  margin-bottom: 0.5rem;
+}
+.heroUpload:hover { border-color: var(--gold); }
+.heroUploadPlaceholder {
+  width:           100%;
+  height:          100%;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.4rem;
+  color:           var(--admin-text-3);
+}
+.heroUploadPlaceholder p    { font-size: 0.8rem; font-weight: 500; }
+.heroUploadPlaceholder span { font-size: 0.68rem; }
+.heroPreviewWrap { position: relative; width: 100%; height: 100%; }
+.heroPreviewImg  { object-fit: cover; }
+.heroPreviewHover {
+  position:        absolute;
+  inset:           0;
+  background:      rgba(0,0,0,0.45);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           #fff;
+  font-size:       0.78rem;
+  font-weight:     600;
+  opacity:         0;
+  transition:      opacity 0.2s;
+}
+.heroUpload:hover .heroPreviewHover { opacity: 1; }
+.heroHint { font-size: 0.68rem; color: var(--admin-text-4); }
+
+.heroIntervalRow {
+  display:     flex;
+  align-items: center;
+  gap:         0.6rem;
+}
+.heroIntervalRow .heroInput { width: 90px; }
+.heroIntervalHint { font-size: 0.76rem; color: var(--admin-text-3); white-space: nowrap; }
+
+/* Text fields */
+.heroTextsCol { display: flex; flex-direction: column; gap: 0.85rem; }
+.heroLabel {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.3rem;
+  font-size:      0.72rem;
+  font-weight:    600;
+  color:          var(--admin-text-2);
+}
+.heroInput {
+  font-family:   inherit;
+  font-size:     0.82rem;
+  padding:       0.5rem 0.7rem;
+  border:        1px solid var(--form-border);
+  border-radius: 6px;
+  color:         var(--admin-text);
+  background:    var(--admin-card);
+  outline:       none;
+  transition:    border-color 0.2s;
+}
+.heroInput:focus { border-color: var(--gold); }
+
+@media (max-width: 768px) {
+  .heroBody { grid-template-columns: 1fr; }
+}
+
+/* ─── Banners Grid ────────────────────────────────────────────────────────── */
+
+/* Grid */
+.grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap:                   1.25rem;
+}
+
+.card {
+  background:    var(--admin-card);
+  border-radius: 10px;
+  overflow:      hidden;
+  box-shadow:    var(--admin-shadow);
+  border:        1px solid var(--admin-border-2);
+  transition:    opacity 0.2s;
+}
+.cardInativo { opacity: 0.6; }
+
+.cardThumb {
+  position:    relative;
+  width:       100%;
+  aspect-ratio: 16/7;
+  background:  var(--admin-border-2);
+}
+.cardImg     { object-fit: cover; }
+.inativoOverlay {
+  position:        absolute;
+  inset:           0;
+  background:      rgba(0,0,0,0.4);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       0.75rem;
+  font-weight:     700;
+  letter-spacing:  0.15em;
+  text-transform:  uppercase;
+  color:           #fff;
+}
+
+.cardBody {
+  padding:   1rem;
+  display:   flex;
+  flex-direction: column;
+  gap:       0.75rem;
+}
+.cardInfo    {}
+.cardTitulo  { font-size: 0.88rem; font-weight: 600; color: var(--admin-text); }
+.cardSub     { font-size: 0.76rem; color: var(--admin-text-3); margin-top: 0.2rem; }
+.cardOrdem   { font-size: 0.7rem;  color: var(--admin-text-4); margin-top: 0.25rem; }
+.sem         { color: var(--admin-text-4); font-style: italic; }
+
+.cardActions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.btnToggle {
+  font-size:     0.72rem;
+  font-weight:   600;
+  padding:       0.25rem 0.65rem;
+  border-radius: 20px;
+  border:        none;
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnToggleOn  { background: #d1fae5; color: #065f46; }
+.btnToggleOff { background: #f3f4f6; color: #6b7280; }
+.btnToggleOn:hover  { background: #a7f3d0; }
+.btnToggleOff:hover { background: #e5e7eb; }
+
+.btnEdit {
+  font-size:     0.72rem;
+  font-weight:   500;
+  padding:       0.25rem 0.75rem;
+  border-radius: 4px;
+  border:        1px solid var(--admin-border);
+  background:    var(--admin-border-2);
+  color:         var(--admin-text-2);
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnEdit:hover { background: var(--admin-border); }
+
+.btnDelete {
+  font-size:     0.72rem;
+  font-weight:   500;
+  padding:       0.25rem 0.75rem;
+  border-radius: 4px;
+  border:        none;
+  background:    var(--action-delete-bg);
+  color:         var(--action-delete-fg);
+  cursor:        pointer;
+  margin-left:   auto;
+  transition:    background 0.15s;
+}
+.btnDelete:hover { background: var(--action-delete-hover); }
+
+/* Empty */
+.empty {
+  background:    var(--admin-card);
+  border-radius: 8px;
+  padding:       4rem 2rem;
+  text-align:    center;
+  color:         var(--admin-text-3);
+  box-shadow:    var(--admin-shadow);
+  display:       flex;
+  flex-direction: column;
+  align-items:   center;
+  gap:           1rem;
+}
+.btnNewEmpty {
+  background:    none;
+  border:        1px solid var(--admin-border);
+  color:         var(--admin-text-2);
+  font-size:     0.8rem;
+  padding:       0.5rem 1.2rem;
+  border-radius: 6px;
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnNewEmpty:hover { background: var(--admin-border-2); }
+
+/* Modal overlay */
+.overlay {
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0, 0, 0, 0.45);
+  z-index:         500;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         1rem;
+}
+
+.modal {
+  background:    var(--admin-card);
+  border-radius: 10px;
+  width:         100%;
+  max-width:     540px;
+  max-height:    90vh;
+  overflow-y:    auto;
+  box-shadow:    0 8px 32px rgba(0,0,0,0.18);
+}
+
+.modalHeader {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         1.25rem 1.5rem;
+  border-bottom:   1px solid var(--admin-border-2);
+}
+.modalTitle { font-size: 1rem; font-weight: 700; color: var(--admin-text); }
+.modalClose {
+  width: 32px; height: 32px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       1.3rem;
+  color:           var(--admin-text-3);
+  background:      none;
+  border:          none;
+  cursor:          pointer;
+  border-radius:   50%;
+  transition:      background 0.15s;
+}
+.modalClose:hover { background: var(--admin-border-2); }
+
+.modalBody  { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.1rem; }
+.modalFooter {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             0.75rem;
+  padding:         1rem 1.5rem;
+  border-top:      1px solid var(--admin-border-2);
+}
+
+.error {
+  background:    var(--form-error-bg);
+  border:        1px solid var(--form-error-border);
+  color:         var(--form-error-text);
+  border-radius: 6px;
+  padding:       0.6rem 0.9rem;
+  font-size:     0.78rem;
+}
+
+/* Upload area */
+.uploadArea {
+  width:         100%;
+  aspect-ratio:  16/7;
+  border:        2px dashed var(--admin-border);
+  border-radius: 8px;
+  cursor:        pointer;
+  overflow:      hidden;
+  position:      relative;
+  transition:    border-color 0.2s;
+}
+.uploadArea:hover { border-color: var(--gold); }
+
+.uploadPlaceholder {
+  width:           100%;
+  height:          100%;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.5rem;
+  color:           var(--admin-text-3);
+}
+.uploadPlaceholder p    { font-size: 0.82rem; font-weight: 500; }
+.uploadPlaceholder span { font-size: 0.7rem; }
+
+.previewWrap { position: relative; width: 100%; height: 100%; }
+.previewImg  { object-fit: cover; }
+.previewHover {
+  position:        absolute;
+  inset:           0;
+  background:      rgba(0,0,0,0.45);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  color:           #fff;
+  font-size:       0.8rem;
+  font-weight:     600;
+  opacity:         0;
+  transition:      opacity 0.2s;
+}
+.uploadArea:hover .previewHover { opacity: 1; }
+
+.fileInput { display: none; }
+
+/* Fields */
+.fields { display: flex; flex-direction: column; gap: 1rem; }
+
+.label {
+  display:       flex;
+  flex-direction: column;
+  gap:           0.35rem;
+  font-size:     0.76rem;
+  font-weight:   600;
+  color:         var(--admin-text-2);
+}
+.input {
+  font-family:   inherit;
+  font-size:     0.82rem;
+  padding:       0.55rem 0.75rem;
+  border:        1px solid var(--form-border);
+  border-radius: 6px;
+  color:         var(--admin-text);
+  background:    var(--admin-card);
+  outline:       none;
+  transition:    border-color 0.2s;
+}
+.input:focus { border-color: var(--gold); }
+
+/* Footer buttons */
+.btnCancel {
+  font-size:     0.8rem;
+  padding:       0.55rem 1.2rem;
+  border-radius: 6px;
+  border:        1px solid var(--admin-border);
+  background:    none;
+  color:         var(--admin-text-3);
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnCancel:hover { background: var(--admin-border-2); }
+.btnSave {
+  font-size:     0.8rem;
+  font-weight:   600;
+  padding:       0.55rem 1.4rem;
+  border-radius: 6px;
+  background:    var(--gold);
+  color:         #fff;
+  border:        none;
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnSave:hover    { background: var(--gold-light); }
+.btnSave:disabled { opacity: 0.6; cursor: not-allowed; }

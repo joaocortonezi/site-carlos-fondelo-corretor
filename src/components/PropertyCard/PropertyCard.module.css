@@ -1,0 +1,105 @@
+.card {
+  background: var(--surface);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Image */
+.imgWrap {
+  position: relative;
+  overflow: hidden;
+}
+.imgInner {
+  position: absolute;
+  inset: 0;
+}
+.img {
+  object-fit: cover;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-card-dark);
+  pointer-events: none;
+}
+
+/* Sizes */
+.featured .imgWrap { height: 380px; }
+.small   .imgWrap { height: 188px; }
+.default .imgWrap { height: 260px; }
+
+/* Tag */
+.tag {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.7rem;
+  border-radius: 2px;
+  z-index: 1;
+}
+.tag_exclusivo  { background: var(--gold);  color: var(--white); }
+.tag_destaque   { background: var(--gold);  color: var(--white); }
+.tag_venda      { background: var(--green); color: var(--white); }
+.tag_lancamento { background: var(--tag-lancamento); color: var(--white); }
+
+.ref {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  color: var(--white-45);
+  background: var(--overlay);
+  padding: 0.22rem 0.5rem;
+  border-radius: 2px;
+}
+
+/* Info */
+.info { padding: 1.1rem 1.3rem; }
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 0.25rem;
+}
+.featured .name { font-size: 1.3rem; }
+.small    .name { font-size: 0.98rem; }
+
+.location {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  transition: color 0.25s;
+}
+.featured .price { font-size: 1.6rem; }
+.small    .price { font-size: 1.15rem; margin-bottom: 0; }
+
+/* Attrs */
+.attrs {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.attr {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--text-soft);
+}
+.attr svg { opacity: 0.6; }

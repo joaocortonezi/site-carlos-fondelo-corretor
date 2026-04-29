@@ -1,0 +1,293 @@
+.loading { color: var(--admin-text-3); padding: 2rem; }
+
+.header { margin-bottom: 1.5rem; }
+.title  { font-size: 1.4rem; font-weight: 700; color: var(--admin-text); margin-bottom: 0.2rem; }
+.sub    { font-size: 0.8rem; color: var(--admin-text-3); }
+
+.card {
+  background:    var(--admin-card);
+  border:        1px solid var(--admin-border-2);
+  border-radius: 10px;
+  padding:       1.5rem;
+  box-shadow:    var(--admin-shadow);
+  border-top:    3px solid var(--gold);
+}
+
+.cardHeader {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  margin-bottom:   1.5rem;
+  gap:             1rem;
+  flex-wrap:       wrap;
+}
+.cardTitle { font-size: 1rem; font-weight: 700; color: var(--admin-text); margin-bottom: 0.15rem; }
+.cardSub   { font-size: 0.76rem; color: var(--admin-text-3); }
+
+.btnSave {
+  background:    var(--gold);
+  color:         #fff;
+  font-size:     0.8rem;
+  font-weight:   600;
+  padding:       0.5rem 1.4rem;
+  border-radius: 6px;
+  border:        none;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    background 0.15s;
+  min-width:     80px;
+}
+.btnSave:hover:not(:disabled) { background: var(--gold-light); }
+.btnSave:disabled { opacity: 0.6; cursor: default; }
+
+.error {
+  background:    rgba(220,50,50,0.12);
+  border:        1px solid rgba(220,50,50,0.3);
+  border-radius: 6px;
+  padding:       0.6rem 0.9rem;
+  color:         #f87171;
+  font-size:     0.82rem;
+  margin-bottom: 1rem;
+}
+
+.body {
+  display: flex;
+  gap:     2rem;
+  flex-wrap: wrap;
+}
+
+/* Photo column */
+.photoCol { display: flex; flex-direction: column; gap: 0.5rem; flex: 0 0 180px; }
+.fieldLabel { font-size: 0.75rem; font-weight: 600; color: var(--admin-text-3); text-transform: uppercase; letter-spacing: 0.04em; }
+
+.photoUpload {
+  width:         160px;
+  height:        160px;
+  border-radius: 50%;
+  border:        2px dashed var(--admin-border-2);
+  cursor:        pointer;
+  overflow:      hidden;
+  position:      relative;
+  transition:    border-color 0.2s;
+  background:    var(--admin-bg);
+}
+.photoUpload:hover { border-color: var(--gold); }
+
+.photoPreviewWrap { position: absolute; inset: 0; }
+.photoPreviewImg  { object-fit: cover; border-radius: 50%; }
+.photoHover {
+  position:   absolute;
+  inset:      0;
+  background: rgba(0,0,0,0.55);
+  display:    flex;
+  align-items: center;
+  justify-content: center;
+  font-size:  0.78rem;
+  color:      #fff;
+  opacity:    0;
+  transition: opacity 0.2s;
+  border-radius: 50%;
+}
+.photoPreviewWrap:hover .photoHover { opacity: 1; }
+
+.photoPlaceholder {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.4rem;
+  height:          100%;
+  color:           var(--admin-text-3);
+  text-align:      center;
+  padding:         1rem;
+}
+.photoPlaceholder p    { font-size: 0.75rem; font-weight: 500; margin: 0; }
+.photoPlaceholder span { font-size: 0.68rem; opacity: 0.7; }
+.photoHint { font-size: 0.7rem; color: var(--admin-text-3); line-height: 1.4; }
+
+.fileInput { display: none; }
+
+/* Fields column */
+.fieldsCol {
+  flex:            1;
+  min-width:       260px;
+  display:         flex;
+  flex-direction:  column;
+  gap:             0.9rem;
+}
+
+.row { display: flex; gap: 0.9rem; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 160px; }
+
+.label {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.35rem;
+  font-size:      0.78rem;
+  font-weight:    600;
+  color:          var(--admin-text-2);
+}
+
+.input {
+  background:    var(--admin-bg);
+  border:        1px solid var(--admin-border-2);
+  border-radius: 6px;
+  padding:       0.55rem 0.75rem;
+  font-size:     0.85rem;
+  color:         var(--admin-text);
+  font-family:   inherit;
+  transition:    border-color 0.15s;
+  width:         100%;
+}
+.input:focus { outline: none; border-color: var(--gold); }
+
+.textarea {
+  background:    var(--admin-bg);
+  border:        1px solid var(--admin-border-2);
+  border-radius: 6px;
+  padding:       0.55rem 0.75rem;
+  font-size:     0.85rem;
+  color:         var(--admin-text);
+  font-family:   inherit;
+  resize:        vertical;
+  transition:    border-color 0.15s;
+  width:         100%;
+  line-height:   1.5;
+}
+.textarea:focus { outline: none; border-color: var(--gold); }
+
+/* Stars picker */
+.starsRow {
+  display:     flex;
+  align-items: center;
+  gap:         0.2rem;
+  margin-top:  0.1rem;
+}
+.starBtn {
+  background:  transparent;
+  border:      none;
+  font-size:   1.4rem;
+  color:       var(--admin-border-2);
+  cursor:      pointer;
+  padding:     0;
+  line-height: 1;
+  transition:  color 0.15s, transform 0.1s;
+}
+.starBtn:hover  { color: var(--gold); transform: scale(1.15); }
+.starActive     { color: var(--gold); }
+.starsValue {
+  font-size:   0.8rem;
+  font-weight: 700;
+  color:       var(--gold);
+  margin-left: 0.35rem;
+}
+
+/* ── Crop Modal ─────────────────────────────────────────────────────────────── */
+.cropOverlay {
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0,0,0,0.85);
+  z-index:         200;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         1rem;
+}
+
+.cropBox {
+  background:    var(--admin-card);
+  border:        1px solid var(--admin-border-2);
+  border-radius: 12px;
+  width:         100%;
+  max-width:     520px;
+  overflow:      hidden;
+  display:       flex;
+  flex-direction: column;
+}
+
+.cropHeader {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         1rem 1.25rem;
+  border-bottom:   1px solid var(--admin-border-2);
+}
+.cropTitle { font-size: 0.95rem; font-weight: 700; color: var(--admin-text); }
+.cropCloseBtn {
+  background: transparent;
+  border:     none;
+  color:      var(--admin-text-3);
+  font-size:  1.4rem;
+  line-height: 1;
+  cursor:     pointer;
+  padding:    0 0.25rem;
+  transition: color 0.15s;
+}
+.cropCloseBtn:hover { color: var(--admin-text); }
+
+.cropArea {
+  position: relative;
+  width:    100%;
+  height:   360px;
+  background: #111;
+}
+
+.cropControls {
+  padding:        1rem 1.25rem;
+  border-top:     1px solid var(--admin-border-2);
+  display:        flex;
+  flex-direction: column;
+  gap:            0.85rem;
+}
+
+.zoomRow {
+  display:     flex;
+  align-items: center;
+  gap:         0.75rem;
+}
+.zoomLabel {
+  font-size:   0.75rem;
+  font-weight: 600;
+  color:       var(--admin-text-3);
+  white-space: nowrap;
+  min-width:   38px;
+}
+.zoomSlider {
+  flex:       1;
+  accent-color: var(--gold);
+  cursor:     pointer;
+}
+
+.cropActions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             0.6rem;
+}
+
+.btnCropCancel {
+  background:    transparent;
+  border:        1px solid var(--admin-border-2);
+  border-radius: 6px;
+  padding:       0.5rem 1.1rem;
+  font-size:     0.82rem;
+  font-weight:   600;
+  color:         var(--admin-text-2);
+  cursor:        pointer;
+  transition:    border-color 0.15s;
+}
+.btnCropCancel:hover:not(:disabled) { border-color: var(--admin-text-2); }
+.btnCropCancel:disabled { opacity: 0.5; cursor: default; }
+
+.btnCropConfirm {
+  background:    var(--gold);
+  border:        none;
+  border-radius: 6px;
+  padding:       0.5rem 1.25rem;
+  font-size:     0.82rem;
+  font-weight:   600;
+  color:         #fff;
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnCropConfirm:hover:not(:disabled) { background: var(--gold-light); }
+.btnCropConfirm:disabled { opacity: 0.6; cursor: default; }

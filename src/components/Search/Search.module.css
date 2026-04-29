@@ -1,0 +1,118 @@
+.section {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+}
+
+.form { display: flex; flex-direction: column; gap: 0.85rem; }
+
+/* Row 1: tipo | bairro | situacao | buscar */
+.row1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+/* Row 2: valor min | valor max | quartos */
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fieldQuartos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 300;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.25s, background 0.25s;
+  font-family: inherit;
+}
+.input::placeholder { color: var(--text-muted); }
+.input:focus {
+  border-color: var(--gold);
+  background: var(--surface3);
+}
+
+.btnSearch {
+  background: var(--gold);
+  color: var(--bg);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 0.72rem 1.6rem;
+  border-radius: var(--radius);
+  border: none;
+  white-space: nowrap;
+  cursor: pointer;
+  align-self: end;
+  transition: background 0.2s;
+}
+.btnSearch:hover { background: var(--gold-light); }
+
+/* Quartos pill buttons */
+.quartosGroup {
+  display: flex;
+  gap: 0.35rem;
+}
+.quartosBtn {
+  flex: 1;
+  font-size: 0.75rem;
+  padding: 0.55rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface2);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.quartosBtn:hover    { border-color: var(--gold); color: var(--gold); }
+.quartosBtnActive    { background: var(--gold); border-color: var(--gold); color: var(--white); }
+
+@media (max-width: 900px) {
+  .row1 { grid-template-columns: 1fr 1fr; }
+  .row1 .btnSearch { grid-column: span 2; }
+  .row2 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .row1 { grid-template-columns: 1fr; }
+  .row1 .btnSearch { grid-column: auto; }
+  .row2 { grid-template-columns: 1fr; }
+}

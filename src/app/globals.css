@@ -1,0 +1,138 @@
+:root {
+  /* ── Backgrounds ── */
+  --bg:             #080808;
+  --surface:        #111111;
+  --surface2:       #181818;
+  --surface3:       #1f1f1f;
+  --card:           #151515;
+  --dropdown-bg:    #1c1c1c;
+  --nav-bg-mobile:    rgba(8, 8, 8, 0.98);
+  --nav-bg-scrolled:  rgba(8, 8, 8, 0.96);
+  --logo-filter:      brightness(0) invert(1);
+
+  /* ── Text ── */
+  --text:           #f0ebe2;
+  --text-muted:     #8a7d6b;
+  --text-soft:      #c0b8ac;
+  --white:          #ffffff;
+  --white-80:       rgba(255, 255, 255, 0.80);
+  --white-60:       rgba(255, 255, 255, 0.60);
+
+  /* ── Marca ── */
+  --gold:           #bc6906;
+  --gold-light:     #d4800f;
+  --gold-dim:       rgba(188, 105, 6, 0.14);
+  --gold-dim-hover: rgba(188, 105, 6, 0.22);
+  --gold-90:        rgba(188, 105, 6, 0.90);
+  --stars:          #f5a623;
+
+  /* ── Botões / CTA ── */
+  --green:          #bc6906;
+  --green-dark:     #a05805;
+  --whatsapp:       #25d366;
+  --whatsapp-dark:  #1ebe5d;
+
+  /* ── Tags de status ── */
+  --tag-venda:      #1b5e3b;
+  --tag-aluguel:    #1a3a5c;
+
+  /* ── Bordas ── */
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-gold:    rgba(188, 105, 6, 0.30);
+
+  /* ── Overlays sobre imagens ── */
+  --overlay:           rgba(0, 0, 0, 0.45);
+  --overlay-hover:     rgba(0, 0, 0, 0.60);
+  --overlay-heavy:     rgba(0, 0, 0, 0.70);
+  --overlay-card:      linear-gradient(to top, rgba(0, 0, 0, 0.45) 0%, transparent 55%);
+  --overlay-card-dark: linear-gradient(to top, rgba(0, 0, 0, 0.70) 0%, transparent 55%);
+  --hero-overlay:      linear-gradient(135deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.38) 60%, rgba(0, 0, 0, 0.76) 100%);
+
+  /* ── Sombras ── */
+  --shadow:         0 8px 24px rgba(0, 0, 0, 0.40);
+  --shadow-hover:   0 16px 48px rgba(0, 0, 0, 0.50);
+
+  /* ── Tags extras ── */
+  --tag-lancamento: #4a7cc9;
+
+  /* ── White com opacidade ── */
+  --white-45:       rgba(255, 255, 255, 0.45);
+
+  /* ── Layout ── */
+  --radius:         4px;
+  --nav-height:     68px;
+  --font-display:   'Cormorant Garamond', serif;
+  --font-body:      'DM Sans', sans-serif;
+
+  /* ── Admin ── */
+  --admin-bg:               #f4f5f7;
+  --admin-card:             #ffffff;
+  --admin-sidebar:          #111111;
+  --admin-text:             #111111;
+  --admin-text-2:           #374151;
+  --admin-text-3:           #6b7280;
+  --admin-text-4:           #9ca3af;
+  --admin-border:           #d1d5db;
+  --admin-border-2:         #e5e7eb;
+  --admin-border-3:         #f3f4f6;
+  --admin-row-hover:        #fafafa;
+  --admin-thead:            #f9fafb;
+  --admin-shadow:           0 1px 4px rgba(0, 0, 0, 0.06);
+  --admin-sidebar-link:     rgba(255, 255, 255, 0.55);
+  --admin-sidebar-hover:    rgba(255, 255, 255, 0.05);
+  --admin-sidebar-divider:  rgba(255, 255, 255, 0.07);
+  --admin-user-text:        rgba(255, 255, 255, 0.35);
+  --admin-logout-text:      rgba(255, 255, 255, 0.50);
+  --admin-nav-active-bg:    rgba(188, 105, 6, 0.08);
+  --badge-disponivel-bg:    #d1fae5;
+  --badge-disponivel-fg:    #065f46;
+  --badge-vendido-bg:       #fee2e2;
+  --badge-vendido-fg:       #991b1b;
+  --badge-alugado-bg:       #dbeafe;
+  --badge-alugado-fg:       #1e40af;
+  --action-edit-bg:         #f3f4f6;
+  --action-edit-fg:         #374151;
+  --action-edit-hover:      #e5e7eb;
+  --action-delete-bg:       #fee2e2;
+  --action-delete-fg:       #991b1b;
+  --action-delete-hover:    #fca5a5;
+  --action-delete-confirm:  #ef4444;
+  --form-error-bg:          #fef2f2;
+  --form-error-border:      #fca5a5;
+  --form-error-text:        #b91c1c;
+  --form-border:            #d1d5db;
+  --form-border-2:          #e5e7eb;
+  --form-hint:              #9ca3af;
+  --form-cancel-hover:      #f9fafb;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: inherit; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}

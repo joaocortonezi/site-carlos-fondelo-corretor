@@ -1,0 +1,82 @@
+/* Layout */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 230px;
+  background: var(--admin-sidebar);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+.sidebarLogo {
+  padding: 1.4rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--admin-sidebar-divider);
+}
+.logoImg {
+  height: 28px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
+/* Nav */
+.nav {
+  flex: 1;
+  padding: 0.75rem 0;
+}
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1.25rem;
+  font-size: 0.82rem;
+  color: var(--admin-sidebar-link);
+  transition: color 0.2s, background 0.2s;
+  border-left: 2px solid transparent;
+}
+.navLink svg  { opacity: 0.7; }
+.navLink:hover { color: var(--white); background: var(--admin-sidebar-hover); }
+.navLinkActive {
+  color: var(--gold) !important;
+  border-left-color: var(--gold);
+  background: var(--admin-nav-active-bg);
+}
+.navLinkActive svg { opacity: 1; }
+
+/* Footer */
+.sidebarFooter {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--admin-sidebar-divider);
+}
+.userEmail {
+  font-size: 0.68rem;
+  color: var(--admin-user-text);
+  word-break: break-all;
+  margin-bottom: 0.6rem;
+}
+.logoutBtn {
+  font-size: 0.75rem;
+  color: var(--admin-logout-text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+.logoutBtn:hover { color: var(--white); }
+
+/* Main content */
+.main {
+  margin-left: 230px;
+  flex: 1;
+  background: var(--admin-bg);
+  min-height: 100vh;
+  padding: 2rem;
+}

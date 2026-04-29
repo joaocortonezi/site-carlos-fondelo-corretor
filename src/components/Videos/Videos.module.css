@@ -1,0 +1,108 @@
+.section {
+  padding: 5rem 0;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 2rem;
+}
+.title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.format {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  margin-top: 0.2rem;
+}
+.verCanal {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.verCanal:hover { color: var(--gold-light); }
+
+/* Drag strip */
+.stripWrap {
+  overflow: hidden;
+  width: 100%;
+}
+.strip {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  padding-bottom: 1rem;
+  user-select: none;
+}
+.stripPad { flex: 0 0 calc((100vw - 1200px) / 2 + 2rem); min-width: 2rem; }
+
+/* Video card */
+.card {
+  flex: 0 0 196px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  border-radius: 2px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border-gold); }
+
+.thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: var(--surface3);
+}
+.thumbImg {
+  object-fit: cover;
+}
+.thumbOverlay {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay);
+  transition: background 0.3s;
+}
+.card:hover .thumbOverlay { background: var(--overlay-hover); }
+
+.playBtn {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px; height: 44px;
+  background: var(--gold-90);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg);
+  transition: transform 0.25s, background 0.25s;
+}
+.card:hover .playBtn {
+  transform: translate(-50%, -50%) scale(1.12);
+  background: var(--gold);
+}
+
+.info { padding: 0.75rem 0.9rem; }
+.cardTitle { font-size: 0.78rem; color: var(--text); margin-bottom: 0.2rem; }
+.cardMeta  { font-size: 0.65rem; color: var(--text-muted); }
+
+.hint {
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 1rem;
+  text-align: center;
+}

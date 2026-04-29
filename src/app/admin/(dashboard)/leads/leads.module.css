@@ -1,0 +1,775 @@
+/* ─── Header ──────────────────────────────────────────────────────────────── */
+
+.header {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  margin-bottom:   1.5rem;
+  gap:             1rem;
+  flex-wrap:       wrap;
+}
+.title { font-size: 1.4rem; font-weight: 700; color: var(--admin-text); margin-bottom: 0.2rem; }
+.count { font-size: 0.8rem; color: var(--admin-text-3); }
+
+.headerActions {
+  display:     flex;
+  align-items: center;
+  gap:         0.5rem;
+  flex-wrap:   wrap;
+}
+
+/* ─── Buttons: Trash + Etapas ─────────────────────────────────────────────── */
+
+.trashBtn {
+  display:       flex;
+  align-items:   center;
+  gap:           0.35rem;
+  font-size:     0.76rem;
+  font-weight:   500;
+  padding:       0.38rem 0.8rem;
+  border-radius: 6px;
+  border:        1px solid var(--admin-border);
+  background:    var(--admin-card);
+  color:         var(--admin-text-2);
+  cursor:        pointer;
+  position:      relative;
+  transition:    background 0.15s, color 0.15s, border-color 0.15s;
+}
+.trashBtn:hover     { background: var(--admin-border-2); color: var(--admin-text); }
+.trashBtnActive     { background: #fee2e2 !important; color: #991b1b !important; border-color: #fca5a5 !important; }
+
+.trashBadge {
+  font-size:     0.65rem;
+  font-weight:   700;
+  background:    #ef4444;
+  color:         #fff;
+  border-radius: 20px;
+  padding:       0.05rem 0.4rem;
+  line-height:   1.5;
+}
+
+.etapasBtn {
+  display:       flex;
+  align-items:   center;
+  gap:           0.35rem;
+  font-size:     0.76rem;
+  font-weight:   500;
+  padding:       0.38rem 0.8rem;
+  border-radius: 6px;
+  border:        1px solid var(--admin-border);
+  background:    var(--admin-card);
+  color:         var(--admin-text-2);
+  cursor:        pointer;
+  transition:    background 0.15s, color 0.15s;
+}
+.etapasBtn:hover { background: var(--admin-border-2); color: var(--admin-text); }
+
+/* ─── View toggle ─────────────────────────────────────────────────────────── */
+
+.viewToggle {
+  display:       flex;
+  gap:           0.3rem;
+  background:    var(--admin-border-2);
+  border-radius: 6px;
+  padding:       3px;
+}
+.viewBtn {
+  display:        flex;
+  align-items:    center;
+  gap:            0.4rem;
+  font-size:      0.76rem;
+  font-weight:    500;
+  padding:        0.35rem 0.8rem;
+  border-radius:  4px;
+  color:          var(--admin-text-3);
+  background:     none;
+  border:         none;
+  cursor:         pointer;
+  transition:     background 0.15s, color 0.15s;
+  white-space:    nowrap;
+}
+.viewBtn:hover  { background: var(--admin-border); color: var(--admin-text-2); }
+.viewBtnActive  { background: var(--admin-card) !important; color: var(--admin-text) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* ─── Kanban board ────────────────────────────────────────────────────────── */
+
+.kanban {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap:                   1rem;
+  align-items:           start;
+}
+
+.kanbanCol {
+  background:     var(--admin-card);
+  border-radius:  10px;
+  box-shadow:     var(--admin-shadow);
+  overflow:       hidden;
+  display:        flex;
+  flex-direction: column;
+  max-height:     calc(100vh - 200px);
+  border-top:     3px solid #6b7280;
+}
+
+.kanbanColHeader {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         0.85rem 1rem;
+  border-bottom:   1px solid var(--admin-border-2);
+}
+.kanbanColTitle {
+  font-size:      0.72rem;
+  font-weight:    700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--admin-text-2);
+}
+.kanbanColBadge {
+  font-size:     0.7rem;
+  font-weight:   700;
+  padding:       0.15rem 0.55rem;
+  border-radius: 20px;
+  line-height:   1.4;
+}
+
+.kanbanCards {
+  padding:        0.75rem;
+  overflow-y:     auto;
+  display:        flex;
+  flex-direction: column;
+  gap:            0.6rem;
+  flex:           1;
+}
+
+.kanbanEmpty {
+  text-align: center;
+  padding:    2rem 1rem;
+  font-size:  0.78rem;
+  color:      var(--admin-text-4);
+}
+
+/* ─── Lead card ───────────────────────────────────────────────────────────── */
+
+.card {
+  background:     var(--admin-card);
+  border:         1px solid var(--admin-border-2);
+  border-radius:  8px;
+  padding:        0.9rem;
+  display:        flex;
+  flex-direction: column;
+  gap:            0.3rem;
+  cursor:         pointer;
+  transition:     box-shadow 0.15s, border-color 0.15s;
+}
+.card:hover  { box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: var(--admin-border); }
+.cardBusy   { opacity: 0.6; pointer-events: none; }
+.cardTrash  { cursor: default; opacity: 0.85; }
+
+.cardTop {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  margin-bottom:   0.2rem;
+}
+
+.origemBadge {
+  font-size:      0.62rem;
+  font-weight:    600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding:        0.12rem 0.45rem;
+  border-radius:  20px;
+}
+.origem_nav     { background: #ede9fe; color: #5b21b6; }
+.origem_video   { background: #fee2e2; color: #991b1b; }
+.origem_imovel  { background: #dbeafe; color: #1e40af; }
+.origem_sobre   { background: #d1fae5; color: #065f46; }
+
+.cardDate {
+  font-size:   0.66rem;
+  color:       var(--admin-text-4);
+  white-space: nowrap;
+}
+
+.cardName  { font-size: 0.85rem; font-weight: 600; color: var(--admin-text); line-height: 1.3; }
+.cardEmail { font-size: 0.72rem; color: var(--admin-text-3); }
+.cardPhone {
+  font-size:   0.78rem;
+  font-weight: 500;
+  color:       var(--gold);
+  transition:  opacity 0.15s;
+  width:       fit-content;
+}
+.cardPhone:hover { opacity: 0.75; }
+
+.cardImovel {
+  font-size:  0.72rem;
+  color:      var(--admin-text-3);
+  font-style: italic;
+  margin-top: 0.1rem;
+}
+.cardMsg {
+  font-size:              0.72rem;
+  color:                  var(--admin-text-4);
+  font-style:             italic;
+  line-height:            1.4;
+  display:                -webkit-box;
+  -webkit-line-clamp:     2;
+  -webkit-box-orient:     vertical;
+  overflow:               hidden;
+}
+
+.cardActions {
+  display:     flex;
+  align-items: center;
+  gap:         0.4rem;
+  margin-top:  0.5rem;
+  flex-wrap:   wrap;
+}
+.btnMove {
+  font-size:     0.72rem;
+  font-weight:   500;
+  padding:       0.28rem 0.55rem;
+  border-radius: 4px;
+  background:    var(--admin-border-2);
+  color:         var(--admin-text-2);
+  border:        1px solid var(--admin-border);
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnMove:hover    { background: var(--admin-border); }
+.btnAdvance {
+  font-size:     0.72rem;
+  font-weight:   600;
+  padding:       0.28rem 0.7rem;
+  border-radius: 4px;
+  background:    #dbeafe;
+  color:         #1d4ed8;
+  border:        none;
+  cursor:        pointer;
+  transition:    background 0.15s;
+  flex:          1;
+}
+.btnAdvance:hover { background: #bfdbfe; }
+.btnDiscard {
+  display:       flex;
+  align-items:   center;
+  font-size:     0.72rem;
+  padding:       0.28rem 0.55rem;
+  border-radius: 4px;
+  background:    var(--action-delete-bg);
+  color:         var(--action-delete-fg);
+  border:        none;
+  cursor:        pointer;
+  transition:    background 0.15s;
+  margin-left:   auto;
+}
+.btnDiscard:hover { background: var(--action-delete-hover); }
+.btnRestore {
+  font-size:     0.72rem;
+  font-weight:   500;
+  padding:       0.28rem 0.7rem;
+  border-radius: 4px;
+  background:    var(--admin-border-2);
+  color:         var(--admin-text-2);
+  border:        1px solid var(--admin-border);
+  cursor:        pointer;
+  flex:          1;
+  text-align:    center;
+  transition:    background 0.15s;
+}
+.btnRestore:hover { background: var(--admin-border); }
+.btnDelete {
+  display:       flex;
+  align-items:   center;
+  padding:       0.28rem 0.55rem;
+  border-radius: 4px;
+  background:    #fee2e2;
+  color:         #dc2626;
+  border:        none;
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.btnDelete:hover { background: #fca5a5; }
+
+/* ─── Trash view ──────────────────────────────────────────────────────────── */
+
+.trashView { }
+
+.trashInfo {
+  font-size:     0.83rem;
+  color:         var(--admin-text-3);
+  margin-bottom: 1.25rem;
+  padding:       0.75rem 1rem;
+  background:    #fff7ed;
+  border:        1px solid #fed7aa;
+  border-radius: 8px;
+}
+
+.trashGrid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap:                   1rem;
+}
+
+/* ─── Lead modal ──────────────────────────────────────────────────────────── */
+
+.modalOverlay {
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0,0,0,0.45);
+  z-index:         200;
+  display:         flex;
+  justify-content: flex-end;
+}
+
+.modalPanel {
+  width:          480px;
+  max-width:      100%;
+  background:     var(--admin-bg);
+  display:        flex;
+  flex-direction: column;
+  height:         100%;
+  overflow:       hidden;
+  box-shadow:     -4px 0 24px rgba(0,0,0,0.15);
+}
+
+.modalHeader {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  padding:         1.25rem 1.5rem;
+  border-bottom:   1px solid var(--admin-border-2);
+  gap:             1rem;
+  flex-shrink:     0;
+}
+.modalName  { font-size: 1.1rem; font-weight: 700; color: var(--admin-text); margin-bottom: 0.4rem; }
+.modalClose {
+  font-size:     1rem;
+  background:    none;
+  border:        none;
+  color:         var(--admin-text-3);
+  cursor:        pointer;
+  padding:       0.2rem 0.4rem;
+  border-radius: 4px;
+  flex-shrink:   0;
+  transition:    background 0.15s;
+}
+.modalClose:hover { background: var(--admin-border-2); color: var(--admin-text); }
+
+.modalBody {
+  flex:       1;
+  overflow-y: auto;
+  padding:    1.25rem 1.5rem;
+  display:    flex;
+  flex-direction: column;
+  gap:        1.5rem;
+}
+
+.modalSection { }
+
+.modalSectionTitle {
+  font-size:      0.7rem;
+  font-weight:    700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--admin-text-3);
+  margin-bottom:  0.75rem;
+}
+
+.modalInfoGrid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   0.75rem;
+}
+.modalInfoItem {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.2rem;
+}
+.modalInfoLabel {
+  font-size:      0.65rem;
+  font-weight:    600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--admin-text-4);
+}
+.modalInfoValue {
+  font-size: 0.85rem;
+  color:     var(--admin-text);
+}
+.modalPhone {
+  font-size:   0.9rem;
+  font-weight: 600;
+  color:       var(--gold);
+  transition:  opacity 0.15s;
+  width:       fit-content;
+}
+.modalPhone:hover { opacity: 0.75; }
+
+.modalMensagem {
+  font-size:   0.88rem;
+  line-height: 1.6;
+  color:       var(--admin-text);
+  background:  var(--admin-border-3);
+  border-left: 3px solid var(--admin-border);
+  padding:     0.75rem 1rem;
+  border-radius: 0 6px 6px 0;
+  white-space: pre-wrap;
+}
+
+/* Etapa buttons */
+.etapaSelect {
+  display:   flex;
+  gap:       0.4rem;
+  flex-wrap: wrap;
+}
+.etapaBtn {
+  font-size:     0.76rem;
+  font-weight:   500;
+  padding:       0.3rem 0.7rem;
+  border-radius: 20px;
+  border:        1px solid var(--admin-border);
+  background:    var(--admin-card);
+  color:         var(--admin-text-2);
+  cursor:        pointer;
+  transition:    background 0.15s, border-color 0.15s;
+}
+.etapaBtn:hover     { background: var(--admin-border-2); }
+.etapaBtnActive     { background: var(--gold) !important; color: #fff !important; border-color: var(--gold) !important; }
+
+/* Notes */
+.notasList {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.6rem;
+  margin-bottom:  0.75rem;
+}
+.notaItem {
+  background:    var(--admin-card);
+  border:        1px solid var(--admin-border-2);
+  border-radius: 6px;
+  padding:       0.65rem 0.9rem;
+}
+.notaHeader {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  margin-bottom:   0.3rem;
+}
+.notaDate   { font-size: 0.67rem; color: var(--admin-text-4); }
+.notaDelete {
+  font-size:     0.65rem;
+  background:    none;
+  border:        none;
+  color:         var(--admin-text-4);
+  cursor:        pointer;
+  padding:       0.1rem 0.3rem;
+  border-radius: 3px;
+  transition:    background 0.12s, color 0.12s;
+}
+.notaDelete:hover { background: #fee2e2; color: #dc2626; }
+.notaTexto  { font-size: 0.83rem; color: var(--admin-text); line-height: 1.5; }
+
+.notaForm {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.5rem;
+}
+.notaInput {
+  font-family:   inherit;
+  font-size:     0.83rem;
+  padding:       0.6rem 0.75rem;
+  border-radius: 6px;
+  border:        1px solid var(--admin-border);
+  background:    var(--admin-card);
+  color:         var(--admin-text);
+  resize:        vertical;
+  transition:    border-color 0.15s;
+}
+.notaInput:focus { outline: none; border-color: var(--gold); }
+.notaSubmit {
+  font-size:     0.78rem;
+  font-weight:   600;
+  padding:       0.4rem 1rem;
+  border-radius: 6px;
+  background:    var(--gold);
+  color:         #fff;
+  border:        none;
+  cursor:        pointer;
+  align-self:    flex-end;
+  transition:    opacity 0.15s;
+}
+.notaSubmit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.modalFooter {
+  padding:      1rem 1.5rem;
+  border-top:   1px solid var(--admin-border-2);
+  flex-shrink:  0;
+}
+.modalDiscard {
+  display:       flex;
+  align-items:   center;
+  gap:           0.4rem;
+  font-size:     0.78rem;
+  font-weight:   500;
+  padding:       0.45rem 1rem;
+  border-radius: 6px;
+  background:    #fee2e2;
+  color:         #dc2626;
+  border:        none;
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.modalDiscard:hover    { background: #fca5a5; }
+.modalDiscard:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Etapas Manager (reutiliza .modalPanel) ──────────────────────────────── */
+
+.etapasInfo {
+  font-size:     0.83rem;
+  color:         var(--admin-text-3);
+  margin-bottom: 1rem;
+  line-height:   1.5;
+}
+
+.etapasList {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.4rem;
+  margin-bottom:  1.5rem;
+}
+
+.etapaRow {
+  display:         flex;
+  align-items:     center;
+  gap:             0.6rem;
+  padding:         0.55rem 0.75rem;
+  background:      var(--admin-card);
+  border:          1px solid var(--admin-border-2);
+  border-radius:   6px;
+}
+.etapaRowFixed {
+  opacity:    0.7;
+  background: var(--admin-border-3);
+}
+
+.etapaCorDot {
+  width:         10px;
+  height:        10px;
+  border-radius: 50%;
+  flex-shrink:   0;
+}
+.etapaNome {
+  font-size:  0.85rem;
+  color:      var(--admin-text);
+  flex:       1;
+}
+.etapaFixedBadge {
+  font-size:      0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--admin-text-4);
+  background:     var(--admin-border-2);
+  padding:        0.1rem 0.4rem;
+  border-radius:  20px;
+}
+.etapaRowActions {
+  display:     flex;
+  align-items: center;
+  gap:         0.25rem;
+}
+.etapaOrderBtn {
+  font-size:     0.75rem;
+  padding:       0.2rem 0.45rem;
+  border-radius: 4px;
+  background:    var(--admin-border-2);
+  color:         var(--admin-text-2);
+  border:        1px solid var(--admin-border);
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.etapaOrderBtn:hover    { background: var(--admin-border); }
+.etapaOrderBtn:disabled { opacity: 0.4; cursor: default; }
+.etapaDelete {
+  font-size:     0.75rem;
+  padding:       0.2rem 0.45rem;
+  border-radius: 4px;
+  background:    #fee2e2;
+  color:         #dc2626;
+  border:        none;
+  cursor:        pointer;
+  transition:    background 0.15s;
+}
+.etapaDelete:hover { background: #fca5a5; }
+
+.etapaAddForm   { }
+.etapaAddRow {
+  display:     flex;
+  align-items: center;
+  gap:         0.5rem;
+  flex-wrap:   wrap;
+}
+.etapaInput {
+  font-family:   inherit;
+  font-size:     0.83rem;
+  padding:       0.4rem 0.7rem;
+  border-radius: 6px;
+  border:        1px solid var(--admin-border);
+  background:    var(--admin-card);
+  color:         var(--admin-text);
+  flex:          1;
+  min-width:     140px;
+  transition:    border-color 0.15s;
+}
+.etapaInput:focus { outline: none; border-color: var(--gold); }
+.etapaColor {
+  width:         36px;
+  height:        36px;
+  border-radius: 6px;
+  border:        1px solid var(--admin-border);
+  padding:       2px;
+  cursor:        pointer;
+  background:    var(--admin-card);
+}
+.etapaAddBtn {
+  font-size:     0.78rem;
+  font-weight:   600;
+  padding:       0.4rem 1rem;
+  border-radius: 6px;
+  background:    var(--gold);
+  color:         #fff;
+  border:        none;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    opacity 0.15s;
+}
+.etapaAddBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ─── Lista / Pipeline counters ───────────────────────────────────────────── */
+
+.pipeline {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap:                   0.75rem;
+  margin-bottom:         1.75rem;
+}
+.pipeCol {
+  background:    var(--admin-card);
+  border:        2px solid var(--admin-border-2);
+  border-radius: 8px;
+  padding:       1rem;
+  text-align:    center;
+  cursor:        pointer;
+  transition:    border-color 0.2s;
+  user-select:   none;
+}
+.pipeCol:hover   { border-color: var(--admin-border); }
+.pipeColActive   { border-color: var(--gold); }
+.pipeCount {
+  display:       block;
+  font-size:     1.8rem;
+  font-weight:   700;
+  color:         var(--admin-text);
+  line-height:   1;
+  margin-bottom: 0.3rem;
+}
+.pipeLabel {
+  font-size:      0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--admin-text-3);
+}
+
+/* ─── Table ───────────────────────────────────────────────────────────────── */
+
+.tableWrap {
+  background:    var(--admin-card);
+  border-radius: 8px;
+  overflow:      auto;
+  box-shadow:    var(--admin-shadow);
+}
+.table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+.table thead { background: var(--admin-thead); }
+.table th {
+  text-align:     left;
+  padding:        0.75rem 1rem;
+  font-size:      0.7rem;
+  font-weight:    600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--admin-text-3);
+  border-bottom:  1px solid var(--admin-border-2);
+  white-space:    nowrap;
+}
+.table td {
+  padding:        0.85rem 1rem;
+  border-bottom:  1px solid var(--admin-border-3);
+  color:          var(--admin-text-2);
+  vertical-align: top;
+}
+.table tbody tr:last-child td { border-bottom: none; }
+.tableRow                     { cursor: pointer; }
+.tableRow:hover td            { background: var(--admin-row-hover); }
+
+.leadNome  { display: block; font-weight: 500; color: var(--admin-text); }
+.leadEmail { display: block; font-size: 0.72rem; color: var(--admin-text-3); margin-top: 0.15rem; }
+
+.telLink {
+  color:       var(--gold);
+  font-weight: 500;
+  transition:  opacity 0.2s;
+  white-space: nowrap;
+}
+.telLink:hover { opacity: 0.75; }
+
+.imovelCell { font-size: 0.8rem; max-width: 180px; }
+.nenhum     { color: var(--admin-text-4); }
+
+.origem {
+  font-size:      0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--admin-text-3);
+}
+.data { font-size: 0.75rem; white-space: nowrap; }
+
+.statusSelect {
+  font-family:   inherit;
+  font-size:     0.72rem;
+  font-weight:   600;
+  padding:       0.28rem 0.6rem;
+  border-radius: 20px;
+  border:        1px solid var(--admin-border);
+  cursor:        pointer;
+  background:    var(--admin-card);
+  color:         var(--admin-text);
+  outline:       none;
+}
+
+/* ─── Empty ───────────────────────────────────────────────────────────────── */
+
+.empty {
+  background:    var(--admin-card);
+  border-radius: 8px;
+  padding:       4rem 2rem;
+  text-align:    center;
+  color:         var(--admin-text-3);
+  box-shadow:    var(--admin-shadow);
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+  .kanban { grid-template-columns: repeat(2, 1fr); }
+  .kanbanCol { max-height: none; }
+}
+@media (max-width: 768px) {
+  .modalPanel { width: 100%; }
+  .modalInfoGrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .kanban   { grid-template-columns: 1fr; }
+  .pipeline { grid-template-columns: repeat(2, 1fr); }
+}
