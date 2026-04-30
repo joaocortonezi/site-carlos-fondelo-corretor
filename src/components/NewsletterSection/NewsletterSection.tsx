@@ -21,21 +21,28 @@ export default function NewsletterSection() {
     setStatus('busy')
     setMsg('')
 
-    const { error } = await supabase.from('newsletter_subscribers').upsert(
-      {
-        email: email.toLowerCase().trim(),
-        nome:  nome.trim() || null,
-        confirmado: true,
-        confirmado_at: new Date().toISOString(),
-        opt_in_origem: 'newsletter_section',
-      },
-      { onConflict: 'email', ignoreDuplicates: true }
-    )
+    const { error } = await supabase.from('newsletter_subscribers').insert({
+      email:         email.toLowerCase().trim(),
+      nome:          nome.trim() || null,
+      confirmado:    true,
+      confirmado_at: new Date().toISOString(),
+      opt_in_origem: 'newsletter_section',
+    })
 
     if (error) {
-      setStatus('error')
-      setMsg('Erro ao cadastrar. Tente novamente.')
+      if (error.code === '23505') {
+        setStatus('ok')
+        setMsg('Você já está na nossa lista. Obrigado!')
+      } else {
+        setStatus('error')
+        setMsg('Erro ao cadastrar. Tente novamente.')
+      }
     } else {
+      fetch('/api/newsletter/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.toLowerCase().trim(), nome: nome.trim() || null }),
+      }).catch(() => {})
       setStatus('ok')
       setMsg('Cadastro realizado! Em breve você receberá nossas novidades.')
       setEmail('')
@@ -71,9 +78,10 @@ export default function NewsletterSection() {
               <input
                 className={styles.input}
                 type="text"
-                placeholder="Seu nome (opcional)"
+                placeholder="Seu nome *"
                 value={nome}
                 onChange={e => setNome(e.target.value)}
+                required
               />
               <input
                 className={styles.input}

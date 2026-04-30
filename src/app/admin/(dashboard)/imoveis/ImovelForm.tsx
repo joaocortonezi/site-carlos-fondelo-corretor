@@ -19,24 +19,47 @@ const SITUACOES   = [
 ] as const
 
 
-async function compressImage(file: File): Promise<File> {
+async function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image()
+    img.crossOrigin = 'anonymous'
+    img.onload  = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
+
+async function compressImage(file: File, watermarkUrl?: string | null): Promise<File> {
   const MAX_PX  = 1920
   const QUALITY = 0.82
   return new Promise((resolve) => {
     const img    = new window.Image()
     const objUrl = URL.createObjectURL(file)
-    img.onload = () => {
+    img.onload = async () => {
       URL.revokeObjectURL(objUrl)
       const { naturalWidth: w, naturalHeight: h } = img
       const needsResize = w > MAX_PX || h > MAX_PX
-      if (!needsResize && file.type === 'image/webp' && file.size < 400_000) {
-        resolve(file); return
-      }
       const ratio   = needsResize ? Math.min(MAX_PX / w, MAX_PX / h) : 1
       const canvas  = document.createElement('canvas')
       canvas.width  = Math.round(w * ratio)
       canvas.height = Math.round(h * ratio)
-      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+      if (watermarkUrl) {
+        try {
+          const wm      = await loadImage(watermarkUrl)
+          const wmW     = Math.round(canvas.width  * 0.28)
+          const wmH     = Math.round((wm.naturalHeight / wm.naturalWidth) * wmW)
+          const margin  = Math.round(canvas.width * 0.02)
+          const x       = canvas.width  - wmW - margin
+          const y       = canvas.height - wmH - margin
+          ctx.globalAlpha = 0.72
+          ctx.drawImage(wm, x, y, wmW, wmH)
+          ctx.globalAlpha = 1
+        } catch { /* marca d'água falhou — continua sem ela */ }
+      }
+
       canvas.toBlob(
         (blob) => {
           if (!blob) { resolve(file); return }
@@ -112,6 +135,7 @@ export default function ImovelForm({ imovel }: Props) {
     if (previewVideoH) URL.revokeObjectURL(previewVideoH)
   }, [previewVideoV, previewVideoH])
 
+  const [watermarkUrl,  setWatermarkUrl]  = useState<string | null>(null)
   const [uploading,     setUploading]     = useState(false)
   const [uploadStatus,  setUploadStatus]  = useState('')
   const [uploadStep,    setUploadStep]    = useState(0)
@@ -123,6 +147,16 @@ export default function ImovelForm({ imovel }: Props) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
+
+  useEffect(() => {
+    supabase
+      .from('configuracoes')
+      .select('valor')
+      .eq('chave', 'watermark_url')
+      .single()
+      .then(({ data }) => { if (data?.valor) setWatermarkUrl(data.valor) })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (isEdit) return
@@ -229,7 +263,7 @@ export default function ImovelForm({ imovel }: Props) {
     for (let i = 0; i < newFiles.length; i++) {
       setUploadStatus(`Comprimindo e enviando foto ${i + 1} de ${newFiles.length}…`)
       setUploadStep(i + 1)
-      const compressed = await compressImage(newFiles[i])
+      const compressed = await compressImage(newFiles[i], watermarkUrl)
       const path = `${imovelId}/${Date.now()}-${i}.webp`
       const { data } = await supabase.storage
         .from('imoveis')

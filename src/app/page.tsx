@@ -88,7 +88,7 @@ export default async function Home() {
       <ExclusiveProperties imoveis={exclusivos ?? []} />
       <Reviews avaliacoes={avaliacoesData ?? []} />
       <HighEnd imoveis={altopadrao ?? []} />
-      <CaptacaoSection telefone={(perfilData as PerfilCorretor | null)?.telefone} />
+      <CaptacaoSection />
       <About perfil={perfilData as PerfilCorretor | null} />
       <NewsletterSection />
       <Footer perfil={perfilData as PerfilCorretor | null} />

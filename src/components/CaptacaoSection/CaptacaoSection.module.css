@@ -35,23 +35,6 @@
   margin-bottom: 1rem;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-top: 1rem;
-  background: #25d366;
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  padding: 0.9rem 1.8rem;
-  border-radius: 3px;
-  transition: background 0.2s;
-  text-decoration: none;
-}
-.btn:hover { background: #1ebe5d; }
-
 /* Card lateral */
 .visual { }
 
@@ -105,6 +88,83 @@
   margin-top: 1px;
   flex-shrink: 0;
 }
+
+/* Form */
+.cardText {
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  margin-top: 0.5rem;
+}
+
+.intencaoRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.intencaoBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.55rem 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 4px);
+  cursor: pointer;
+  color: var(--text-muted);
+  background: var(--surface2);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.intencaoBtn input[type=radio] { display: none; }
+.intencaoBtnActive {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-dim, rgba(184,105,6,0.07));
+}
+
+.input {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.7rem;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 4px);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.input:focus { border-color: var(--gold); }
+.input::placeholder { color: var(--text-muted); }
+
+.formError {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin-bottom: 0.6rem;
+}
+
+.submitBtn {
+  width: 100%;
+  margin-top: 0.2rem;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: var(--radius, 4px);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.submitBtn:hover    { background: var(--gold-light); }
+.submitBtn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 @media (max-width: 768px) {
   .inner { grid-template-columns: 1fr; gap: 2.5rem; }

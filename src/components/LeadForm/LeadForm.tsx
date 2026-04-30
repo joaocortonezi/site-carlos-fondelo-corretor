@@ -44,11 +44,27 @@ export default function LeadForm({ imovelId, imovelTitulo, origem, onSuccess, co
 
     if (err) { setError('Erro ao enviar. Tente novamente.'); setBusy(false); return }
 
+    fetch('/api/lead/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...form, imovel_titulo: imovelTitulo, origem }),
+    }).catch(() => {})
+
     if (optIn && form.email) {
-      await supabase.from('newsletter_subscribers').upsert(
-        { email: form.email, nome: form.nome || null, confirmado: true, confirmado_at: new Date().toISOString(), opt_in_origem: origem },
-        { onConflict: 'email', ignoreDuplicates: true }
-      )
+      const { error: subErr } = await supabase.from('newsletter_subscribers').insert({
+        email:         form.email,
+        nome:          form.nome || null,
+        confirmado:    true,
+        confirmado_at: new Date().toISOString(),
+        opt_in_origem: origem,
+      })
+      if (!subErr) {
+        fetch('/api/newsletter/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email, nome: form.nome }),
+        }).catch(() => {})
+      }
     }
 
     if (onSuccess) onSuccess()

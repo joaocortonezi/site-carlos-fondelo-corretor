@@ -1,13 +1,13 @@
 .section {
   padding: 5rem 0;
-  background: #0e0c09;
-  --card:       #1a1713;
-  --surface:    #1a1713;
-  --text:       #f0ebe2;
-  --text-muted: #8a7d6b;
-  --text-soft:  #c0b8ac;
-  --border:     rgba(255, 255, 255, 0.07);
-  --overlay-card: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);
+  background: #9e5c04;
+  --card:             #fff8ee;
+  --surface:          #fff8ee;
+  --text:             #1a1208;
+  --text-muted:       #6b4918;
+  --text-soft:        #3d2810;
+  --border:           rgba(158, 92, 4, 0.3);
+  --overlay-card-dark: transparent;
 }
 
 .header {
@@ -20,11 +20,11 @@
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 500;
-  color: var(--gold);
+  color: #fff;
 }
 .sub {
   font-size: 0.7rem;
-  color: rgba(188, 105, 6, 0.55);
+  color: rgba(255, 255, 255, 0.6);
   letter-spacing: 0.06em;
   margin-top: 0.2rem;
 }
@@ -33,11 +33,11 @@
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: #fff;
   white-space: nowrap;
-  transition: color 0.2s;
+  transition: opacity 0.2s;
 }
-.verTodos:hover { color: var(--gold-light); }
+.verTodos:hover { opacity: 0.65; }
 
 .grid {
   display: grid;
