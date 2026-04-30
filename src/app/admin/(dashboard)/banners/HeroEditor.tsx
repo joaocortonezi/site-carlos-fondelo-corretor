@@ -155,6 +155,20 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
   const [saved,     setSaved]     = useState(false)
   const [error,     setError]     = useState('')
 
+  /* Sincroniza estado quando config carrega do banco (monta com null, depois recebe dados) */
+  useEffect(() => {
+    if (!config) return
+    setLayers(
+      config.camadas && config.camadas.length > 0
+        ? config.camadas
+        : makeDefaultLayers(config)
+    )
+    setOverlay(config.overlay_config ?? makeDefaultOverlay(config))
+    setBgPreview(config.url_imagem ?? null)
+    setBgFile(null)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config?.id])  // só re-executa quando um config diferente é carregado
+
   /* Mede a largura do canvas para escalonamento correto de fontes rem */
   useEffect(() => {
     const obs = new ResizeObserver(es => setCanvasW(es[0].contentRect.width))
