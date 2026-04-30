@@ -1,9 +1,8 @@
 import { Resend }       from 'resend'
 import { NextResponse } from 'next/server'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(req: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { email, nome } = await req.json()
     if (!email) return NextResponse.json({ ok: false }, { status: 400 })

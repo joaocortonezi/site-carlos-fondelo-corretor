@@ -1,8 +1,6 @@
 import { Resend }       from 'resend'
 import { NextResponse } from 'next/server'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 interface Recipient { email: string; nome: string | null }
 
 function makeHtml(nome: string | null, body: string) {
@@ -34,6 +32,7 @@ function makeHtml(nome: string | null, body: string) {
 }
 
 export async function POST(req: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { subject, body, recipients }: {
       subject:    string
