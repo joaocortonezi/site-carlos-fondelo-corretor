@@ -67,6 +67,50 @@ export interface Banner {
   updated_at:  string
 }
 
+export interface HeroLayer {
+  id:            string
+  tipo:          'texto' | 'botao'
+  texto:         string
+  x:             number   // 0–100 (% do canvas)
+  y:             number   // 0–100 (% do canvas)
+  fontSize:      number   // rem
+  fontFamily?:   string   // CSS var, ex: 'var(--font-playfair)'
+  fontWeight:    number
+  cor:           string   // hex
+  opacity:       number   // 0–1
+  letterSpacing: number   // em
+  lineHeight:    number
+  textAlign:     'left' | 'center' | 'right'
+  italic:        boolean
+  uppercase:     boolean
+  // apenas para tipo === 'botao'
+  corFundo?:           string
+  opacidadeFundo?:     number
+  corContorno?:        string
+  opacidadeContorno?:  number
+  paddingX?:           number  // rem
+  paddingY?:           number  // rem
+  borderRadius?:       number  // px
+  href?:               string
+}
+
+export interface HeroGradientStop {
+  id:        string
+  cor:       string
+  opacidade: number  // 0–1
+  posicao:   number  // 0–100
+}
+
+export interface HeroOverlayConfig {
+  tipo:     'nenhum' | 'solido' | 'gradiente_linear' | 'gradiente_radial'
+  cor?:     string
+  opacidade?: number
+  angulo?:  number        // graus (gradiente_linear)
+  centroX?: number        // 0–100 (gradiente_radial)
+  centroY?: number        // 0–100 (gradiente_radial)
+  paradas?: HeroGradientStop[]
+}
+
 export interface HeroConfig {
   id:                   string
   url_imagem:           string | null
@@ -102,7 +146,9 @@ export interface HeroConfig {
   btn2_opacidade_fundo:    number
   btn2_cor_contorno:       string
   btn2_opacidade_contorno: number
-  updated_at:           string
+  camadas?:        HeroLayer[]       | null
+  overlay_config?: HeroOverlayConfig | null
+  updated_at:      string
 }
 
 export interface PerfilCorretor {

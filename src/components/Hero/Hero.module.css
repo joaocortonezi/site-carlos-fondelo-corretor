@@ -23,6 +23,15 @@
   background: var(--hero-overlay);
 }
 
+/* Camadas livres (novo sistema) */
+.layersContainer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.layersContainer a { pointer-events: all; }
+
 /* Content */
 .content {
   position: relative;
