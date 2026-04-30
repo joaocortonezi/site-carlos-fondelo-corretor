@@ -46,8 +46,8 @@ export default function BannersPage() {
     setBusy(null)
   }
 
-  const openNew   = () => { setEditing(null); setModalOpen(true) }
-  const openEdit  = (b: Banner) => { setEditing(b); setModalOpen(true) }
+  const openNew    = () => { setEditing(null); setModalOpen(true) }
+  const openEdit   = (b: Banner) => { setEditing(b); setModalOpen(true) }
   const closeModal = () => { setModalOpen(false); setEditing(null) }
 
   const onSaved = (saved: Banner) => {
@@ -70,7 +70,6 @@ export default function BannersPage() {
         <button className={styles.btnNew} onClick={openNew}>+ Novo Banner</button>
       </div>
 
-      {/* ── Hero Principal ── */}
       <HeroConfigSection
         config={heroConfig}
         supabase={supabase}
@@ -143,31 +142,84 @@ function HeroConfigSection({ config, supabase, onSaved }: {
   supabase: ReturnType<typeof createBrowserClient>
   onSaved:  (c: HeroConfig) => void
 }) {
-  const fileRef  = useRef<HTMLInputElement>(null)
-  const [form, setForm] = useState({
-    eyebrow:   config?.eyebrow   ?? 'Corretor de Imóveis · CRECI 000000',
-    titulo_1:  config?.titulo_1  ?? 'O imóvel certo',
-    titulo_2:  config?.titulo_2  ?? 'para cada',
-    titulo_3:  config?.titulo_3  ?? 'história.',
-    subtitulo: config?.subtitulo ?? 'Atendimento personalizado · Compra, venda e locação',
-    intervalo: config?.intervalo ?? 5,
-  })
-  const [preview,  setPreview]  = useState<string | null>(config?.url_imagem ?? null)
-  const [file,     setFile]     = useState<File | null>(null)
-  const [busy,     setBusy]     = useState(false)
-  const [saved,    setSaved]    = useState(false)
-  const [error,    setError]    = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
-  // Sync form se o config carregar depois
+  const [form, setForm] = useState({
+    eyebrow:                 config?.eyebrow                 ?? 'Corretor de Imóveis · CRECI 000000',
+    titulo_1:                config?.titulo_1                ?? 'O imóvel certo',
+    titulo_2:                config?.titulo_2                ?? 'para cada',
+    titulo_3:                config?.titulo_3                ?? 'história.',
+    subtitulo:               config?.subtitulo               ?? 'Atendimento personalizado · Compra, venda e locação',
+    intervalo:               config?.intervalo               ?? 5,
+    cor_fundo:               config?.cor_fundo               ?? '#000000',
+    cor_fundo_opacidade:     config?.cor_fundo_opacidade     ?? 0.55,
+    cor_eyebrow:             config?.cor_eyebrow             ?? '',
+    cor_titulo_1:            config?.cor_titulo_1            ?? '',
+    cor_titulo_2:            config?.cor_titulo_2            ?? '',
+    cor_titulo_3:            config?.cor_titulo_3            ?? '',
+    cor_subtitulo:           config?.cor_subtitulo           ?? '',
+    peso_eyebrow:            config?.peso_eyebrow            ?? 400,
+    peso_titulo_1:           config?.peso_titulo_1           ?? 400,
+    peso_titulo_2:           config?.peso_titulo_2           ?? 400,
+    peso_titulo_3:           config?.peso_titulo_3           ?? 300,
+    peso_subtitulo:          config?.peso_subtitulo          ?? 400,
+    btn1_texto:              config?.btn1_texto              ?? 'Ver Imóveis',
+    btn1_cor_texto:          config?.btn1_cor_texto          ?? '',
+    btn1_peso:               config?.btn1_peso               ?? 600,
+    btn1_cor_fundo:          config?.btn1_cor_fundo          ?? '',
+    btn1_opacidade_fundo:    config?.btn1_opacidade_fundo    ?? 1,
+    btn1_cor_contorno:       config?.btn1_cor_contorno       ?? '',
+    btn1_opacidade_contorno: config?.btn1_opacidade_contorno ?? 0,
+    btn2_texto:              config?.btn2_texto              ?? 'Conheça Carlos →',
+    btn2_cor_texto:          config?.btn2_cor_texto          ?? '',
+    btn2_peso:               config?.btn2_peso               ?? 600,
+    btn2_cor_fundo:          config?.btn2_cor_fundo          ?? '',
+    btn2_opacidade_fundo:    config?.btn2_opacidade_fundo    ?? 0,
+    btn2_cor_contorno:       config?.btn2_cor_contorno       ?? '',
+    btn2_opacidade_contorno: config?.btn2_opacidade_contorno ?? 0,
+  })
+
+  const [preview, setPreview] = useState<string | null>(config?.url_imagem ?? null)
+  const [file,    setFile]    = useState<File | null>(null)
+  const [busy,    setBusy]    = useState(false)
+  const [saved,   setSaved]   = useState(false)
+  const [error,   setError]   = useState('')
+
   useEffect(() => {
     if (!config) return
     setForm({
-      eyebrow:   config.eyebrow,
-      titulo_1:  config.titulo_1,
-      titulo_2:  config.titulo_2,
-      titulo_3:  config.titulo_3,
-      subtitulo: config.subtitulo,
-      intervalo: config.intervalo ?? 5,
+      eyebrow:                 config.eyebrow,
+      titulo_1:                config.titulo_1,
+      titulo_2:                config.titulo_2,
+      titulo_3:                config.titulo_3,
+      subtitulo:               config.subtitulo,
+      intervalo:               config.intervalo               ?? 5,
+      cor_fundo:               config.cor_fundo               ?? '#000000',
+      cor_fundo_opacidade:     config.cor_fundo_opacidade     ?? 0.55,
+      cor_eyebrow:             config.cor_eyebrow             ?? '',
+      cor_titulo_1:            config.cor_titulo_1            ?? '',
+      cor_titulo_2:            config.cor_titulo_2            ?? '',
+      cor_titulo_3:            config.cor_titulo_3            ?? '',
+      cor_subtitulo:           config.cor_subtitulo           ?? '',
+      peso_eyebrow:            config.peso_eyebrow            ?? 400,
+      peso_titulo_1:           config.peso_titulo_1           ?? 400,
+      peso_titulo_2:           config.peso_titulo_2           ?? 400,
+      peso_titulo_3:           config.peso_titulo_3           ?? 300,
+      peso_subtitulo:          config.peso_subtitulo          ?? 400,
+      btn1_texto:              config.btn1_texto              ?? 'Ver Imóveis',
+      btn1_cor_texto:          config.btn1_cor_texto          ?? '',
+      btn1_peso:               config.btn1_peso               ?? 600,
+      btn1_cor_fundo:          config.btn1_cor_fundo          ?? '',
+      btn1_opacidade_fundo:    config.btn1_opacidade_fundo    ?? 1,
+      btn1_cor_contorno:       config.btn1_cor_contorno       ?? '',
+      btn1_opacidade_contorno: config.btn1_opacidade_contorno ?? 0,
+      btn2_texto:              config.btn2_texto              ?? 'Conheça Carlos →',
+      btn2_cor_texto:          config.btn2_cor_texto          ?? '',
+      btn2_peso:               config.btn2_peso               ?? 600,
+      btn2_cor_fundo:          config.btn2_cor_fundo          ?? '',
+      btn2_opacidade_fundo:    config.btn2_opacidade_fundo    ?? 0,
+      btn2_cor_contorno:       config.btn2_cor_contorno       ?? '',
+      btn2_opacidade_contorno: config.btn2_opacidade_contorno ?? 0,
     })
     setPreview(config.url_imagem ?? null)
   }, [config])
@@ -198,7 +250,24 @@ function HeroConfigSection({ config, supabase, onSaved }: {
       url = `${publicUrl}?t=${Date.now()}`
     }
 
-    const payload = { ...form, intervalo: Number(form.intervalo), url_imagem: url, updated_at: new Date().toISOString() }
+    const payload = {
+      ...form,
+      intervalo:               Number(form.intervalo),
+      cor_fundo_opacidade:     Number(form.cor_fundo_opacidade),
+      peso_eyebrow:            Number(form.peso_eyebrow),
+      peso_titulo_1:           Number(form.peso_titulo_1),
+      peso_titulo_2:           Number(form.peso_titulo_2),
+      peso_titulo_3:           Number(form.peso_titulo_3),
+      peso_subtitulo:          Number(form.peso_subtitulo),
+      btn1_peso:               Number(form.btn1_peso),
+      btn1_opacidade_fundo:    Number(form.btn1_opacidade_fundo),
+      btn1_opacidade_contorno: Number(form.btn1_opacidade_contorno),
+      btn2_peso:               Number(form.btn2_peso),
+      btn2_opacidade_fundo:    Number(form.btn2_opacidade_fundo),
+      btn2_opacidade_contorno: Number(form.btn2_opacidade_contorno),
+      url_imagem:              url,
+      updated_at:              new Date().toISOString(),
+    }
 
     let result: HeroConfig | null = null
     if (config) {
@@ -220,14 +289,15 @@ function HeroConfigSection({ config, supabase, onSaved }: {
     setTimeout(() => setSaved(false), 3000)
   }
 
-  const set = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }))
+  const set    = (k: keyof typeof form, v: string)  => setForm(f => ({ ...f, [k]: v }))
+  const setNum = (k: keyof typeof form, v: number) => setForm(f => ({ ...f, [k]: v }))
 
   return (
     <div className={styles.heroSection}>
       <div className={styles.heroSectionHeader}>
         <div>
           <h2 className={styles.heroSectionTitle}>Slide 0 — Hero Principal</h2>
-          <p className={styles.heroSectionSub}>Imagem de fundo e textos do primeiro slide</p>
+          <p className={styles.heroSectionSub}>Imagem de fundo, textos e botões do primeiro slide</p>
         </div>
         <button className={styles.btnSaveHero} onClick={handleSave} disabled={busy}>
           {busy ? 'Salvando…' : saved ? '✓ Salvo' : 'Salvar'}
@@ -237,7 +307,7 @@ function HeroConfigSection({ config, supabase, onSaved }: {
       {error && <p className={styles.heroError}>{error}</p>}
 
       <div className={styles.heroBody}>
-        {/* Imagem */}
+        {/* Coluna esquerda — imagem + overlay */}
         <div className={styles.heroImgCol}>
           <p className={styles.heroFieldLabel}>Imagem de fundo</p>
           <div className={styles.heroUpload} onClick={() => fileRef.current?.click()}>
@@ -256,58 +326,96 @@ function HeroConfigSection({ config, supabase, onSaved }: {
           </div>
           <input ref={fileRef} type="file" accept="image/*" className={styles.fileInput} onChange={handleFile} />
           <p className={styles.heroHint}>Se vazio, usa a imagem padrão do servidor</p>
+
+          <div className={styles.bgColorSection}>
+            <p className={styles.heroFieldLabel}>Cor de fundo (overlay)</p>
+            <div className={styles.bgColorRow}>
+              <input
+                type="color"
+                className={styles.colorPicker}
+                value={form.cor_fundo}
+                onChange={e => set('cor_fundo', e.target.value)}
+                title="Cor do overlay"
+              />
+              <span className={styles.bgColorHex}>{form.cor_fundo}</span>
+              <span className={styles.bgColorSep}>·</span>
+              <span className={styles.bgColorLabel}>Opacidade</span>
+              <input
+                type="range"
+                className={styles.opacityRange}
+                min={0} max={1} step={0.01}
+                value={form.cor_fundo_opacidade}
+                onChange={e => setNum('cor_fundo_opacidade', Number(e.target.value))}
+              />
+              <span className={styles.opacityVal}>{Math.round(Number(form.cor_fundo_opacidade) * 100)}%</span>
+            </div>
+            <div
+              className={styles.bgPreview}
+              style={{ background: form.cor_fundo, opacity: form.cor_fundo_opacidade }}
+            />
+          </div>
         </div>
 
-        {/* Textos */}
+        {/* Coluna direita — textos, pesos, botões */}
         <div className={styles.heroTextsCol}>
-          <p className={styles.heroFieldLabel}>Textos</p>
+          <p className={styles.heroFieldLabel}>Textos, cores e pesos de fonte</p>
 
-          <label className={styles.heroLabel}>
-            Eyebrow (linha pequena)
-            <input
-              className={styles.heroInput}
-              value={form.eyebrow}
-              onChange={e => set('eyebrow', e.target.value)}
-              placeholder="Ex: Corretor de Imóveis · CRECI 000000"
-            />
-          </label>
+          <TextColorField
+            label="Eyebrow (linha pequena)"
+            value={form.eyebrow}
+            color={form.cor_eyebrow}
+            defaultColor="#bc6906"
+            placeholder="Ex: Corretor de Imóveis · CRECI 000000"
+            weight={form.peso_eyebrow}
+            onText={v  => set('eyebrow', v)}
+            onColor={v => set('cor_eyebrow', v)}
+            onWeight={v => setNum('peso_eyebrow', v)}
+          />
 
-          <label className={styles.heroLabel}>
-            Título — linha 1
-            <input
-              className={styles.heroInput}
-              value={form.titulo_1}
-              onChange={e => set('titulo_1', e.target.value)}
-            />
-          </label>
+          <TextColorField
+            label="Título — linha 1"
+            value={form.titulo_1}
+            color={form.cor_titulo_1}
+            defaultColor="#ffffff"
+            weight={form.peso_titulo_1}
+            onText={v  => set('titulo_1', v)}
+            onColor={v => set('cor_titulo_1', v)}
+            onWeight={v => setNum('peso_titulo_1', v)}
+          />
 
-          <label className={styles.heroLabel}>
-            Título — linha 2
-            <input
-              className={styles.heroInput}
-              value={form.titulo_2}
-              onChange={e => set('titulo_2', e.target.value)}
-            />
-          </label>
+          <TextColorField
+            label="Título — linha 2"
+            value={form.titulo_2}
+            color={form.cor_titulo_2}
+            defaultColor="#ffffff"
+            weight={form.peso_titulo_2}
+            onText={v  => set('titulo_2', v)}
+            onColor={v => set('cor_titulo_2', v)}
+            onWeight={v => setNum('peso_titulo_2', v)}
+          />
 
-          <label className={styles.heroLabel}>
-            Título — linha 3 (itálico dourado)
-            <input
-              className={styles.heroInput}
-              value={form.titulo_3}
-              onChange={e => set('titulo_3', e.target.value)}
-            />
-          </label>
+          <TextColorField
+            label="Título — linha 3 (itálico)"
+            value={form.titulo_3}
+            color={form.cor_titulo_3}
+            defaultColor="#d4800f"
+            weight={form.peso_titulo_3}
+            onText={v  => set('titulo_3', v)}
+            onColor={v => set('cor_titulo_3', v)}
+            onWeight={v => setNum('peso_titulo_3', v)}
+          />
 
-          <label className={styles.heroLabel}>
-            Subtítulo
-            <input
-              className={styles.heroInput}
-              value={form.subtitulo}
-              onChange={e => set('subtitulo', e.target.value)}
-              placeholder="Ex: Atendimento personalizado · Compra, venda e locação"
-            />
-          </label>
+          <TextColorField
+            label="Subtítulo"
+            value={form.subtitulo}
+            color={form.cor_subtitulo}
+            defaultColor="#7a7265"
+            placeholder="Ex: Atendimento personalizado · Compra, venda e locação"
+            weight={form.peso_subtitulo}
+            onText={v  => set('subtitulo', v)}
+            onColor={v => set('cor_subtitulo', v)}
+            onWeight={v => setNum('peso_subtitulo', v)}
+          />
 
           <label className={styles.heroLabel}>
             Intervalo entre banners (segundos)
@@ -318,11 +426,54 @@ function HeroConfigSection({ config, supabase, onSaved }: {
                 min={2}
                 max={30}
                 value={form.intervalo}
-                onChange={e => setForm(f => ({ ...f, intervalo: Number(e.target.value) }))}
+                onChange={e => setNum('intervalo', Number(e.target.value))}
               />
               <span className={styles.heroIntervalHint}>{form.intervalo}s por slide</span>
             </div>
           </label>
+
+          {/* ── Botões ── */}
+          <div className={styles.heroBtnsSection}>
+            <p className={styles.heroFieldLabel}>Botões</p>
+
+            <ButtonFields
+              label="Botão 1 — Primário"
+              texto={form.btn1_texto}
+              corTexto={form.btn1_cor_texto}
+              defaultCorTexto="#1a1006"
+              peso={form.btn1_peso}
+              corFundo={form.btn1_cor_fundo}
+              opacidadeFundo={form.btn1_opacidade_fundo}
+              corContorno={form.btn1_cor_contorno}
+              opacidadeContorno={form.btn1_opacidade_contorno}
+              onTexto={v  => set('btn1_texto', v)}
+              onCorTexto={v => set('btn1_cor_texto', v)}
+              onPeso={v => setNum('btn1_peso', v)}
+              onCorFundo={v => set('btn1_cor_fundo', v)}
+              onOpacidadeFundo={v => setNum('btn1_opacidade_fundo', v)}
+              onCorContorno={v => set('btn1_cor_contorno', v)}
+              onOpacidadeContorno={v => setNum('btn1_opacidade_contorno', v)}
+            />
+
+            <ButtonFields
+              label="Botão 2 — Secundário"
+              texto={form.btn2_texto}
+              corTexto={form.btn2_cor_texto}
+              defaultCorTexto="#7a7265"
+              peso={form.btn2_peso}
+              corFundo={form.btn2_cor_fundo}
+              opacidadeFundo={form.btn2_opacidade_fundo}
+              corContorno={form.btn2_cor_contorno}
+              opacidadeContorno={form.btn2_opacidade_contorno}
+              onTexto={v  => set('btn2_texto', v)}
+              onCorTexto={v => set('btn2_cor_texto', v)}
+              onPeso={v => setNum('btn2_peso', v)}
+              onCorFundo={v => set('btn2_cor_fundo', v)}
+              onOpacidadeFundo={v => setNum('btn2_opacidade_fundo', v)}
+              onCorContorno={v => set('btn2_cor_contorno', v)}
+              onOpacidadeContorno={v => setNum('btn2_opacidade_contorno', v)}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -332,11 +483,11 @@ function HeroConfigSection({ config, supabase, onSaved }: {
 // ─── Modal ────────────────────────────────────────────────────────────────────
 
 interface ModalProps {
-  banner:     Banner | null
-  supabase:   ReturnType<typeof createBrowserClient>
-  onClose:    () => void
-  onSaved:    (b: Banner) => void
-  nextOrdem:  number
+  banner:    Banner | null
+  supabase:  ReturnType<typeof createBrowserClient>
+  onClose:   () => void
+  onSaved:   (b: Banner) => void
+  nextOrdem: number
 }
 
 function BannerModal({ banner, supabase, onClose, onSaved, nextOrdem }: ModalProps) {
@@ -406,7 +557,6 @@ function BannerModal({ banner, supabase, onClose, onSaved, nextOrdem }: ModalPro
         <div className={styles.modalBody}>
           {error && <p className={styles.error}>{error}</p>}
 
-          {/* Image */}
           <div className={styles.uploadArea} onClick={() => fileRef.current?.click()}>
             {preview ? (
               <div className={styles.previewWrap}>
@@ -429,7 +579,6 @@ function BannerModal({ banner, supabase, onClose, onSaved, nextOrdem }: ModalPro
             onChange={handleFile}
           />
 
-          {/* Fields */}
           <div className={styles.fields}>
             <label className={styles.label}>
               Título
@@ -468,6 +617,196 @@ function BannerModal({ banner, supabase, onClose, onSaved, nextOrdem }: ModalPro
             {busy ? 'Salvando…' : 'Salvar Banner'}
           </button>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── TextColorField ───────────────────────────────────────────────────────────
+
+interface TextColorFieldProps {
+  label:        string
+  value:        string
+  color:        string
+  defaultColor: string
+  placeholder?: string
+  weight?:      number
+  onText:       (v: string) => void
+  onColor:      (v: string) => void
+  onWeight?:    (v: number) => void
+}
+
+function TextColorField({ label, value, color, defaultColor, placeholder, weight, onText, onColor, onWeight }: TextColorFieldProps) {
+  return (
+    <label className={styles.heroLabel}>
+      <div className={styles.heroLabelRow}>
+        <span>{label}</span>
+        <div className={styles.colorControls}>
+          {onWeight !== undefined && (
+            <select
+              className={styles.weightSelect}
+              value={weight ?? 400}
+              onChange={e => onWeight(Number(e.target.value))}
+              title="Peso da fonte"
+            >
+              <option value={300}>Light 300</option>
+              <option value={400}>Normal 400</option>
+              <option value={500}>Medium 500</option>
+              <option value={600}>Semi 600</option>
+              <option value={700}>Bold 700</option>
+              <option value={800}>Extra 800</option>
+              <option value={900}>Black 900</option>
+            </select>
+          )}
+          <input
+            type="color"
+            className={styles.colorPicker}
+            value={color || defaultColor}
+            onChange={e => onColor(e.target.value)}
+            title={color ? color : 'Padrão'}
+          />
+          {color && (
+            <button
+              type="button"
+              className={styles.colorClear}
+              onClick={() => onColor('')}
+              title="Restaurar cor padrão"
+            >
+              ×
+            </button>
+          )}
+          {!color && <span className={styles.colorDefault}>padrão</span>}
+        </div>
+      </div>
+      <input
+        className={styles.heroInput}
+        value={value}
+        onChange={e => onText(e.target.value)}
+        placeholder={placeholder}
+      />
+    </label>
+  )
+}
+
+// ─── ButtonFields ─────────────────────────────────────────────────────────────
+
+interface ButtonFieldsProps {
+  label:               string
+  texto:               string
+  corTexto:            string
+  defaultCorTexto:     string
+  peso:                number
+  corFundo:            string
+  opacidadeFundo:      number
+  corContorno:         string
+  opacidadeContorno:   number
+  onTexto:             (v: string) => void
+  onCorTexto:          (v: string) => void
+  onPeso:              (v: number) => void
+  onCorFundo:          (v: string) => void
+  onOpacidadeFundo:    (v: number) => void
+  onCorContorno:       (v: string) => void
+  onOpacidadeContorno: (v: number) => void
+}
+
+function ButtonFields({
+  label, texto, corTexto, defaultCorTexto, peso,
+  corFundo, opacidadeFundo, corContorno, opacidadeContorno,
+  onTexto, onCorTexto, onPeso, onCorFundo, onOpacidadeFundo, onCorContorno, onOpacidadeContorno,
+}: ButtonFieldsProps) {
+  return (
+    <div className={styles.btnConfigBlock}>
+      <p className={styles.btnConfigLabel}>{label}</p>
+
+      {/* Texto + peso + cor do texto */}
+      <label className={styles.heroLabel}>
+        <div className={styles.heroLabelRow}>
+          <span>Texto do botão</span>
+          <div className={styles.colorControls}>
+            <select
+              className={styles.weightSelect}
+              value={peso}
+              onChange={e => onPeso(Number(e.target.value))}
+              title="Peso da fonte"
+            >
+              <option value={300}>Light 300</option>
+              <option value={400}>Normal 400</option>
+              <option value={500}>Medium 500</option>
+              <option value={600}>Semi 600</option>
+              <option value={700}>Bold 700</option>
+              <option value={800}>Extra 800</option>
+            </select>
+            <input
+              type="color"
+              className={styles.colorPicker}
+              value={corTexto || defaultCorTexto}
+              onChange={e => onCorTexto(e.target.value)}
+              title={corTexto ? corTexto : 'Padrão'}
+            />
+            {corTexto && (
+              <button type="button" className={styles.colorClear} onClick={() => onCorTexto('')}>×</button>
+            )}
+            {!corTexto && <span className={styles.colorDefault}>padrão</span>}
+          </div>
+        </div>
+        <input
+          className={styles.heroInput}
+          value={texto}
+          onChange={e => onTexto(e.target.value)}
+          placeholder="Ex: Ver Imóveis"
+        />
+      </label>
+
+      {/* Cor de fundo + opacidade */}
+      <div className={styles.btnColorRow}>
+        <span className={styles.btnColorLabel}>Fundo</span>
+        <input
+          type="color"
+          className={styles.colorPicker}
+          value={corFundo || '#bc6906'}
+          onChange={e => onCorFundo(e.target.value)}
+        />
+        {corFundo ? (
+          <>
+            <button type="button" className={styles.colorClear} onClick={() => onCorFundo('')}>×</button>
+            <input
+              type="range"
+              className={styles.opacityRange}
+              min={0} max={1} step={0.01}
+              value={opacidadeFundo}
+              onChange={e => onOpacidadeFundo(Number(e.target.value))}
+            />
+            <span className={styles.opacityVal}>{Math.round(opacidadeFundo * 100)}%</span>
+          </>
+        ) : (
+          <span className={styles.colorDefault}>padrão</span>
+        )}
+      </div>
+
+      {/* Cor de contorno + opacidade */}
+      <div className={styles.btnColorRow}>
+        <span className={styles.btnColorLabel}>Contorno</span>
+        <input
+          type="color"
+          className={styles.colorPicker}
+          value={corContorno || '#bc6906'}
+          onChange={e => onCorContorno(e.target.value)}
+        />
+        {corContorno ? (
+          <>
+            <button type="button" className={styles.colorClear} onClick={() => onCorContorno('')}>×</button>
+            <input
+              type="range"
+              className={styles.opacityRange}
+              min={0} max={1} step={0.01}
+              value={opacidadeContorno}
+              onChange={e => onOpacidadeContorno(Number(e.target.value))}
+            />
+            <span className={styles.opacityVal}>{Math.round(opacidadeContorno * 100)}%</span>
+          </>
+        ) : (
+          <span className={styles.colorDefault}>padrão</span>
+        )}
       </div>
     </div>
   )

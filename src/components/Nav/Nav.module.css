@@ -97,14 +97,6 @@
 .barMidHidden { opacity: 0; transform: scaleX(0); }
 .barBotOpen  { transform: translateY(-6.5px) rotate(-45deg); }
 
-/* Nav transparent state (over hero — photo always has dark overlay) */
-.navTransparent .link { color: var(--white-80); }
-.navTransparent .link:hover { color: var(--gold); }
-.navTransparent .barTop,
-.navTransparent .barMid,
-.navTransparent .barBot { background: var(--white); }
-.navTransparent .logoImg { filter: brightness(0) invert(1); }
-
 /* Mobile menu */
 .mobileMenu {
   overflow: hidden;

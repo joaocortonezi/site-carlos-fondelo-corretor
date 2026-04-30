@@ -68,15 +68,41 @@ export interface Banner {
 }
 
 export interface HeroConfig {
-  id:         string
-  url_imagem: string | null
-  eyebrow:    string
-  titulo_1:   string
-  titulo_2:   string
-  titulo_3:   string
-  subtitulo:  string
-  intervalo:  number
-  updated_at: string
+  id:                   string
+  url_imagem:           string | null
+  eyebrow:              string
+  titulo_1:             string
+  titulo_2:             string
+  titulo_3:             string
+  subtitulo:            string
+  intervalo:            number
+  cor_fundo:            string
+  cor_fundo_opacidade:  number
+  cor_eyebrow:          string
+  cor_titulo_1:         string
+  cor_titulo_2:         string
+  cor_titulo_3:         string
+  cor_subtitulo:        string
+  peso_eyebrow:         number
+  peso_titulo_1:        number
+  peso_titulo_2:        number
+  peso_titulo_3:        number
+  peso_subtitulo:       number
+  btn1_texto:              string
+  btn1_cor_texto:          string
+  btn1_peso:               number
+  btn1_cor_fundo:          string
+  btn1_opacidade_fundo:    number
+  btn1_cor_contorno:       string
+  btn1_opacidade_contorno: number
+  btn2_texto:              string
+  btn2_cor_texto:          string
+  btn2_peso:               number
+  btn2_cor_fundo:          string
+  btn2_opacidade_fundo:    number
+  btn2_cor_contorno:       string
+  btn2_opacidade_contorno: number
+  updated_at:           string
 }
 
 export interface PerfilCorretor {

@@ -32,12 +32,11 @@ export default function Nav() {
   return (
     <>
     <motion.nav
-      className={`${styles.nav} ${scrolled ? '' : styles.navTransparent}`}
-      animate={{ backgroundColor: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(0,0,0,0)' }}
-      transition={{ duration: 0.4 }}
+      className={styles.nav}
       style={{
-        backdropFilter: scrolled ? 'blur(14px)' : 'none',
-        boxShadow: scrolled ? '0 1px 20px rgba(0,0,0,0.07)' : 'none',
+        backgroundColor: 'rgba(255,255,255,0.97)',
+        backdropFilter:  scrolled ? 'blur(14px)' : 'none',
+        boxShadow:       scrolled ? '0 1px 20px rgba(0,0,0,0.07)' : 'none',
       }}
     >
       <div className={styles.inner}>
