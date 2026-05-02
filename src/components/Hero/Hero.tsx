@@ -136,13 +136,16 @@ export default function Hero({ banners = [], heroConfig }: Props) {
     ...banners.filter(b => !!b.url_imagem).map(b => ({ url: b.url_imagem, branded: false })),
   ]
   const [current, setCurrent] = useState(0)
-  const advance = useCallback(() => setCurrent(c => (c + 1) % allSlides.length), [allSlides.length])
+  const [resetKey, setResetKey] = useState(0)
   const intervaloMs = (heroConfig?.intervalo ?? 5) * 1000
+  const advance = useCallback(() => setCurrent(c => (c + 1) % allSlides.length), [allSlides.length])
+  const prev = useCallback(() => { setCurrent(c => (c - 1 + allSlides.length) % allSlides.length); setResetKey(k => k + 1) }, [allSlides.length])
+  const next = useCallback(() => { setCurrent(c => (c + 1) % allSlides.length); setResetKey(k => k + 1) }, [allSlides.length])
   useEffect(() => {
     if (allSlides.length <= 1) return
     const id = setInterval(advance, intervaloMs)
     return () => clearInterval(id)
-  }, [allSlides.length, advance, intervaloMs])
+  }, [allSlides.length, advance, intervaloMs, resetKey])
 
   const containerVariants = {
     hidden:  {},
@@ -166,7 +169,13 @@ export default function Hero({ banners = [], heroConfig }: Props) {
           transition={{ duration: 0.9, ease: 'easeInOut' }}
         >
           <Image src={slide.url} alt="" fill priority={i === 0} className={styles.bgImage} sizes="100vw" />
-          <div className={styles.bgOverlay} style={i === 0 ? overlayStyle : undefined} />
+          <div
+            className={styles.bgOverlay}
+            style={i === 0
+              ? (overlayStyle ?? { background: 'none' })
+              : { background: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.28) 60%, rgba(0,0,0,0.60) 100%)' }
+            }
+          />
         </motion.div>
       ))}
 
@@ -265,11 +274,27 @@ export default function Hero({ banners = [], heroConfig }: Props) {
         )}
       </AnimatePresence>
 
+      {/* ── Arrows ── */}
+      {allSlides.length > 1 && (
+        <div className={styles.arrows}>
+          <button className={styles.arrow} onClick={prev} aria-label="Slide anterior">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M13 4L7 10L13 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <button className={styles.arrow} onClick={next} aria-label="Próximo slide">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7 4L13 10L7 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* ── Dots ── */}
       {allSlides.length > 1 && (
         <div className={styles.dots}>
           {allSlides.map((_, i) => (
-            <button key={i} className={`${styles.dot} ${i === current ? styles.dotActive : ''}`} onClick={() => setCurrent(i)} aria-label={`Slide ${i + 1}`} />
+            <button key={i} className={`${styles.dot} ${i === current ? styles.dotActive : ''}`} onClick={() => { setCurrent(i); setResetKey(k => k + 1) }} aria-label={`Slide ${i + 1}`} />
           ))}
         </div>
       )}
