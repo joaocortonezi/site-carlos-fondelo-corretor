@@ -1,3 +1,9 @@
+// ─── Modal do editor visual de Banners Editáveis ─────────────────────────────
+// Funciona igual ao HeroEditor mas para banners adicionais (slides 1+).
+// A diferença principal: não tem camadas padrão geradas a partir de config legado.
+// Abre como modal full-screen sobre a página de banners.
+// Compartilha toda a lógica de drag e camadas com HeroEditor via LayerEditorShared.
+
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'

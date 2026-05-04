@@ -1,19 +1,33 @@
+// ─── Componentes compartilhados do editor visual ─────────────────────────────
+// Este arquivo é usado tanto pelo HeroEditor (slide 0) quanto pelo BannerEditavelModal
+// (banners adicionais). Contém:
+//   - Utilitários: uid(), hexRgb(), overlayCssStr(), paradasValidas()
+//   - LINK_OPTIONS: destinos pré-definidos para botões
+//   - LayersTab: painel de camadas + propriedades
+//   - BackgroundTab: upload de fundo + configurador de overlay
+
 'use client'
 
 import Image from 'next/image'
 import { HeroLayer, HeroOverlayConfig, HeroGradientStop } from '@/lib/types'
-import { HERO_FONTS, DEFAULT_FONT } from '@/lib/hero-fonts'
-import styles from './HeroEditor.module.css'
+import { HERO_FONTS, DEFAULT_FONT }                        from '@/lib/hero-fonts'
+import styles                                              from './HeroEditor.module.css'
 
-// ─── Utilities ────────────────────────────────────────────────────────────────
+// ─── Utilitários ─────────────────────────────────────────────────────────────
 
+/** Gera um ID único de 8 caracteres (suficiente para IDs de camada). */
 export function uid() { return Math.random().toString(36).slice(2, 10) }
 
+/** Converte cor hex para tupla RGB. */
 export function hexRgb(hex: string): [number, number, number] {
   const h = hex.replace('#', '')
   return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)]
 }
 
+/**
+ * Converte HeroOverlayConfig para string CSS background (para uso inline no canvas do admin).
+ * Retorna 'transparent' quando tipo='nenhum' ou configuração incompleta.
+ */
 export function overlayCssStr(oc: HeroOverlayConfig): string {
   if (oc.tipo === 'nenhum') return 'transparent'
   if (oc.tipo === 'solido' && oc.cor) {
@@ -30,12 +44,17 @@ export function overlayCssStr(oc: HeroOverlayConfig): string {
   return 'transparent'
 }
 
+/**
+ * Valida se um array de paradas é suficiente para renderizar um gradiente.
+ * Exige pelo menos 2 paradas com posições distintas.
+ */
 export function paradasValidas(p?: HeroGradientStop[]): boolean {
   if (!p || p.length < 2) return false
   const posicoes = new Set(p.map(x => x.posicao))
   return posicoes.size >= 2
 }
 
+/** Destinos pré-definidos para o campo href de camadas de botão. */
 export const LINK_OPTIONS = [
   { group: 'Seções da página inicial' },
   { label: 'Busca de Imóveis',   value: '#imoveis'    },
@@ -52,6 +71,8 @@ export const LINK_OPTIONS = [
 ] as const
 
 // ─── LayersTab ────────────────────────────────────────────────────────────────
+// Lista de camadas (invertida: topo da pilha primeiro) + painel de propriedades
+// da camada selecionada.
 
 export function LayersTab({ layers, selectedId, onSelect, onMove, onRemove, onUpdate }: {
   layers:     HeroLayer[]
@@ -65,13 +86,15 @@ export function LayersTab({ layers, selectedId, onSelect, onMove, onRemove, onUp
 
   return (
     <div className={styles.layersTab}>
+      {/* Lista de camadas — exibida de cima para baixo (índice maior = mais acima) */}
       <div className={styles.layerList}>
         <p className={styles.panelLabel}>Camadas (topo → fundo)</p>
         {layers.length === 0 && (
           <p className={styles.emptyHint}>Nenhuma camada. Use &quot;+ Texto&quot; ou &quot;+ Botão&quot; acima.</p>
         )}
+        {/* Inverte o array para exibir as camadas do topo para o fundo */}
         {[...layers].reverse().map((layer, ri) => {
-          const idx = layers.length - 1 - ri
+          const idx = layers.length - 1 - ri   // índice real no array original
           return (
             <div
               key={layer.id}
@@ -81,6 +104,7 @@ export function LayersTab({ layers, selectedId, onSelect, onMove, onRemove, onUp
               <span className={styles.layerIcon}>{layer.tipo === 'botao' ? '⬛' : '𝐓'}</span>
               <span className={styles.layerText}>{layer.texto.slice(0, 28)}{layer.texto.length > 28 ? '…' : ''}</span>
               <div className={styles.layerActions}>
+                {/* dir=-1 sobe a camada (aumenta z-index), dir=1 desce */}
                 <button title="Subir" onClick={e => { e.stopPropagation(); onMove(layer.id, -1) }} disabled={idx === layers.length - 1}>↑</button>
                 <button title="Descer" onClick={e => { e.stopPropagation(); onMove(layer.id, 1) }} disabled={idx === 0}>↓</button>
                 <button title="Excluir" className={styles.layerDel} onClick={e => { e.stopPropagation(); onRemove(layer.id) }}>×</button>
@@ -90,6 +114,7 @@ export function LayersTab({ layers, selectedId, onSelect, onMove, onRemove, onUp
         })}
       </div>
 
+      {/* Painel de propriedades — aparece quando uma camada está selecionada */}
       {selected && <LayerProps layer={selected} onUpdate={onUpdate} />}
       {!selected && layers.length > 0 && (
         <p className={styles.emptyHint} style={{ marginTop: '1rem' }}>
@@ -101,11 +126,14 @@ export function LayersTab({ layers, selectedId, onSelect, onMove, onRemove, onUp
 }
 
 // ─── LayerProps ───────────────────────────────────────────────────────────────
+// Formulário de propriedades da camada selecionada.
+// Cada campo chama onUpdate com um patch parcial — evita re-renders desnecessários.
 
 export function LayerProps({ layer, onUpdate }: {
   layer:    HeroLayer
   onUpdate: (id: string, patch: Partial<HeroLayer>) => void
 }) {
+  // Atalhos para evitar repetição de layer.id e casting
   const set    = (patch: Partial<HeroLayer>) => onUpdate(layer.id, patch)
   const setNum = (key: keyof HeroLayer, v: string) => onUpdate(layer.id, { [key]: Number(v) } as Partial<HeroLayer>)
 
@@ -123,6 +151,7 @@ export function LayerProps({ layer, onUpdate }: {
         />
       </label>
 
+      {/* Seletor de fonte — exibe o nome na própria fonte para facilitar a escolha */}
       <label className={styles.field}>
         <span>Família de fonte</span>
         <div className={styles.fontGrid}>
@@ -184,6 +213,7 @@ export function LayerProps({ layer, onUpdate }: {
         </label>
       </div>
 
+      {/* Posição em % do canvas — também editável arrastando no canvas */}
       <div className={styles.row2}>
         <label className={styles.field}>
           <span>Posição X (%)</span>
@@ -220,10 +250,12 @@ export function LayerProps({ layer, onUpdate }: {
         </button>
       </div>
 
+      {/* Propriedades exclusivas de botão — fundo, contorno, padding, radius, href */}
       {layer.tipo === 'botao' && (
         <div className={styles.btnSection}>
           <p className={styles.panelLabel} style={{ marginTop: '0.75rem' }}>Botão</p>
 
+          {/* Seletor de destino: seções pré-definidas ou URL personalizada */}
           <div className={styles.field}>
             <span>Destino do botão</span>
             <div className={styles.linkGrid}>
@@ -244,6 +276,7 @@ export function LayerProps({ layer, onUpdate }: {
                 )
               })}
             </div>
+            {/* Input de URL customizada — aparece vazio quando um link pré-definido está ativo */}
             <div className={styles.linkCustomRow}>
               <span className={styles.linkCustomLabel}>URL personalizada</span>
               <input
@@ -324,6 +357,8 @@ export function LayerProps({ layer, onUpdate }: {
 }
 
 // ─── BackgroundTab ────────────────────────────────────────────────────────────
+// Aba "Fundo & Película" do editor visual.
+// Gerencia upload de imagem de fundo e configuração do overlay (película).
 
 export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOverlayChange }: {
   bgPreview:       string | null
@@ -334,6 +369,7 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
 }) {
   const set = (patch: Partial<HeroOverlayConfig>) => onOverlayChange({ ...overlay, ...patch })
 
+  // Adiciona uma nova parada de cor ao gradiente com valores padrão
   const addStop = () => {
     const paradas = [...(overlay.paradas ?? []), { id: uid(), cor: '#000000', opacidade: 0.5, posicao: 50 }]
     set({ paradas })
@@ -346,6 +382,8 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
   return (
     <div className={styles.bgTab}>
       <p className={styles.panelLabel}>Imagem de fundo</p>
+
+      {/* Área de upload — clique abre o seletor de arquivo */}
       <div className={styles.bgUpload} onClick={() => fileRef.current?.click()}>
         {bgPreview ? (
           <div className={styles.bgPreviewWrap}>
@@ -363,16 +401,19 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
 
       <p className={styles.panelLabel} style={{ marginTop: '1.25rem' }}>Película (overlay)</p>
 
+      {/* Seletor de tipo de overlay — ao trocar, inicializa com valores padrão sensatos */}
       <div className={styles.overlayTypes}>
         {(['nenhum','solido','gradiente_linear','gradiente_radial'] as const).map(t => (
           <button
             key={t}
             className={`${styles.overlayTypeBtn} ${overlay.tipo === t ? styles.overlayTypeBtnActive : ''}`}
             onClick={() => {
+              // Paradas padrão para gradientes: preto 75% → transparente
               const defaultParadas = [
                 { id: uid(), cor: '#000000', opacidade: 0.75, posicao: 0   },
                 { id: uid(), cor: '#000000', opacidade: 0,    posicao: 100 },
               ]
+              // Reaproveitamos paradas existentes se forem válidas, senão usamos o padrão
               const defaults: Partial<HeroOverlayConfig> =
                 t === 'solido'           ? { cor: overlay.cor ?? '#000000', opacidade: overlay.opacidade ?? 0.55 } :
                 t === 'gradiente_linear' ? { angulo: 135, paradas: paradasValidas(overlay.paradas) ? overlay.paradas : defaultParadas } :
@@ -389,6 +430,7 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
         ))}
       </div>
 
+      {/* Controles de cor sólida */}
       {overlay.tipo === 'solido' && (
         <div className={styles.solidSection}>
           <label className={styles.field}>
@@ -403,12 +445,15 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
             <input type="range" min={0} max={1} step={0.01} value={overlay.opacidade ?? 0.55}
               onChange={e => set({ opacidade: Number(e.target.value) })} className={styles.range} />
           </label>
+          {/* Preview ao vivo do overlay */}
           <div className={styles.overlayPreviewStrip} style={{ background: overlayCssStr(overlay) }} />
         </div>
       )}
 
+      {/* Controles de gradiente (linear ou radial) */}
       {(overlay.tipo === 'gradiente_linear' || overlay.tipo === 'gradiente_radial') && (
         <div className={styles.gradSection}>
+          {/* Ângulo — apenas gradiente linear */}
           {overlay.tipo === 'gradiente_linear' && (
             <label className={styles.field}>
               <span>Ângulo {overlay.angulo ?? 135}°</span>
@@ -416,6 +461,7 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
                 onChange={e => set({ angulo: Number(e.target.value) })} className={styles.range} />
             </label>
           )}
+          {/* Centro — apenas gradiente radial */}
           {overlay.tipo === 'gradiente_radial' && (
             <div className={styles.row2}>
               <label className={styles.field}>
@@ -433,6 +479,7 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
 
           <div className={styles.overlayPreviewStrip} style={{ background: overlayCssStr(overlay) }} />
 
+          {/* Editor de paradas de cor do gradiente */}
           <p className={styles.panelLabel} style={{ marginTop: '0.75rem' }}>Paradas de cor</p>
           {(overlay.paradas ?? []).map((stop, i) => (
             <div key={stop.id} className={styles.stopRow}>
@@ -442,6 +489,7 @@ export function BackgroundTab({ bgPreview, fileRef, overlay, onFileChange, onOve
                 title={`Opacidade ${Math.round(stop.opacidade * 100)}%`}
                 onChange={e => updateStop(stop.id, { opacidade: Number(e.target.value) })} />
               <span className={styles.stopPct}>{Math.round(stop.opacidade * 100)}%</span>
+              {/* Posição no gradiente em % */}
               <input type="number" className={styles.stopPos} min={0} max={100} value={stop.posicao}
                 onChange={e => updateStop(stop.id, { posicao: Number(e.target.value) })} />
               <span className={styles.dimText}>%</span>

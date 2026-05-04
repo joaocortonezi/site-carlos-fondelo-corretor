@@ -1,3 +1,8 @@
+// ─── API: e-mail de boas-vindas para inscritos na newsletter ─────────────────
+// Chamado pelo NewsletterSection após inserir o inscrito no banco.
+// Envia e-mail de boas-vindas personalizado com o primeiro nome do inscrito.
+// Inclui CTA para a página de imóveis e instrução de como se descadastrar.
+
 import { Resend }       from 'resend'
 import { NextResponse } from 'next/server'
 

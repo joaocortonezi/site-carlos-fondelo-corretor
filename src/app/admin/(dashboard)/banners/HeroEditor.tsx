@@ -1,3 +1,13 @@
+// ─── Editor visual do Slide 0 (hero_config) ───────────────────────────────────
+// Interface drag-and-drop para posicionar camadas de texto/botão sobre a imagem
+// de fundo do hero principal.
+//
+// Técnica de drag: PointerEvents + setPointerCapture permite arrastar camadas
+// mesmo que o cursor saia do elemento durante o movimento rápido.
+//
+// Canvas proporcional a 1440px: a escala (canvasW/1440) é aplicada via font-size
+// no container, fazendo que rem escale automaticamente com o canvas.
+
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'

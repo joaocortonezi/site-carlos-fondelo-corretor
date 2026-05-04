@@ -1,3 +1,10 @@
+// ─── Admin — Sobre mim ────────────────────────────────────────────────────────
+// Página de edição do perfil do corretor. Contém dois cards:
+//   1. PerfilForm   — nome, CRECI, contatos, bio, estatísticas, foto de perfil (com crop circular)
+//   2. CinemaUploadCard — foto em proporção 2.35:1 para a seção Cinemascope da home
+//
+// Ambos salvam na tabela `perfil_corretor`. As imagens vão para o bucket `banners` no Supabase Storage.
+
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'

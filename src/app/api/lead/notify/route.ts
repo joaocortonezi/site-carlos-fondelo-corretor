@@ -1,3 +1,8 @@
+// ─── API: notificação de novo lead ───────────────────────────────────────────
+// Chamado pelo LeadForm após salvar o lead no banco.
+// Envia e-mail HTML formatado para o corretor (RESEND_NOTIFY_TO) via Resend.
+// Inclui botão de WhatsApp direto no e-mail para facilitar o retorno imediato.
+
 import { Resend }       from 'resend'
 import { NextResponse } from 'next/server'
 
