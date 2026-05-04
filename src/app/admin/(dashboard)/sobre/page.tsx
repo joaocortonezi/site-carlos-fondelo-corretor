@@ -60,6 +60,9 @@ export default function SobrePage() {
         </div>
       </div>
       <PerfilForm perfil={perfil} supabase={supabase} onSaved={setPerfil} />
+      <div style={{ marginTop: '1.5rem' }}>
+        <CinemaUploadCard perfil={perfil} supabase={supabase} onSaved={setPerfil} />
+      </div>
     </div>
   )
 }
@@ -369,6 +372,133 @@ function PersonIcon() {
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
       <circle cx="12" cy="7" r="4"/>
+    </svg>
+  )
+}
+
+// ── Cinema Upload Card ────────────────────────────────────────────────────────
+function CinemaUploadCard({ perfil, supabase, onSaved }: {
+  perfil:   PerfilCorretor | null
+  supabase: ReturnType<typeof createBrowserClient>
+  onSaved:  (p: PerfilCorretor) => void
+}) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [preview, setPreview] = useState<string | null>(perfil?.foto_cinemascope_url ?? null)
+  const [file,    setFile]    = useState<File | null>(null)
+  const [busy,    setBusy]    = useState(false)
+  const [saved,   setSaved]   = useState(false)
+  const [error,   setError]   = useState('')
+
+  useEffect(() => {
+    setPreview(perfil?.foto_cinemascope_url ?? null)
+  }, [perfil])
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    if (!f) return
+    e.target.value = ''
+    setFile(f)
+    setPreview(URL.createObjectURL(f))
+  }
+
+  const handleRemove = async () => {
+    if (!perfil) return
+    if (!confirm('Remover a foto cinemascope do site?')) return
+    setBusy(true)
+    setError('')
+    const { data, error: err } = await supabase
+      .from('perfil_corretor')
+      .update({ foto_cinemascope_url: null, updated_at: new Date().toISOString() })
+      .eq('id', perfil.id)
+      .select()
+      .single()
+    if (err) { setError(err.message); setBusy(false); return }
+    setPreview(null)
+    setFile(null)
+    onSaved(data as PerfilCorretor)
+    setBusy(false)
+  }
+
+  const handleSave = async () => {
+    if (!file) return
+    if (!perfil) { setError('Salve o perfil primeiro.'); return }
+    setBusy(true)
+    setError('')
+    setSaved(false)
+
+    const ext = file.name.split('.').pop() ?? 'jpg'
+    const fileName = `perfil-cinemascope.${ext}`
+    await supabase.storage.from('banners').remove([fileName])
+    const { error: upErr } = await supabase.storage
+      .from('banners')
+      .upload(fileName, file, { cacheControl: '3600', upsert: true })
+    if (upErr) { setError(upErr.message); setBusy(false); return }
+
+    const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(fileName)
+    const url = `${publicUrl}?t=${Date.now()}`
+
+    const { data, error: err } = await supabase
+      .from('perfil_corretor')
+      .update({ foto_cinemascope_url: url, updated_at: new Date().toISOString() })
+      .eq('id', perfil.id)
+      .select()
+      .single()
+    if (err) { setError(err.message); setBusy(false); return }
+
+    setFile(null)
+    onSaved(data as PerfilCorretor)
+    setSaved(true)
+    setBusy(false)
+    setTimeout(() => setSaved(false), 3000)
+  }
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.cardHeader}>
+        <div>
+          <h2 className={styles.cardTitle}>Foto Cinemascope</h2>
+          <p className={styles.cardSub}>Seção de foto livre (proporção 2.35:1). Não aparece no site se estiver vazia.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {preview && (
+            <button className={styles.btnRemove} onClick={handleRemove} disabled={busy}>
+              Remover
+            </button>
+          )}
+          {file && (
+            <button className={styles.btnSave} onClick={handleSave} disabled={busy}>
+              {busy ? 'Salvando…' : saved ? '✓ Salvo' : 'Salvar'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {error && <p className={styles.error}>{error}</p>}
+
+      <div className={styles.cinemaUpload} onClick={() => fileRef.current?.click()}>
+        {preview ? (
+          <div className={styles.cinemaPreviewWrap}>
+            <Image src={preview} alt="Cinemascope" fill sizes="(max-width: 900px) 100vw, 860px" className={styles.cinemaPreviewImg} />
+            <div className={styles.cinemaHover}>Trocar imagem</div>
+          </div>
+        ) : (
+          <div className={styles.cinemaPlaceholder}>
+            <CinemaIcon />
+            <p>Clique para selecionar imagem</p>
+            <span>PNG, JPG, WebP — proporção sugerida: 2.35:1</span>
+          </div>
+        )}
+      </div>
+      <input ref={fileRef} type="file" accept="image/*" className={styles.fileInput} onChange={handleFile} />
+    </div>
+  )
+}
+
+function CinemaIcon() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="2" y="7" width="20" height="10" rx="2"/>
+      <path d="M7 7V5M12 7V5M17 7V5M7 17v2M12 17v2M17 17v2"/>
     </svg>
   )
 }

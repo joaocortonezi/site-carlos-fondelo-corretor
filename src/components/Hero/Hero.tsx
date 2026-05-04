@@ -3,12 +3,12 @@
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { useRef, useState, useEffect, useCallback }          from 'react'
 import Image                                                   from 'next/image'
-import { HeroConfig, HeroLayer, HeroOverlayConfig }           from '@/lib/types'
+import { Banner, HeroConfig, HeroLayer, HeroOverlayConfig }   from '@/lib/types'
 import { DEFAULT_FONT }                                        from '@/lib/hero-fonts'
 import styles                                                  from './Hero.module.css'
 
 interface Props {
-  banners?:    Array<{ url_imagem: string }>
+  banners?:    Pick<Banner, 'url_imagem' | 'tipo' | 'camadas' | 'overlay_config'>[]
   heroConfig?: HeroConfig | null
 }
 
@@ -81,6 +81,7 @@ function buttonLayerStyle(layer: HeroLayer): React.CSSProperties {
   }
 }
 
+
 export default function Hero({ banners = [], heroConfig }: Props) {
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
@@ -89,7 +90,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
 
   const hasCamadas = !!(heroConfig?.camadas && heroConfig.camadas.length > 0)
 
-  /* ── Overlay ── */
+  /* ── Overlay do slide 0 ── */
   const overlayStyle = hasCamadas
     ? overlayCss(heroConfig?.overlay_config)
     : (() => {
@@ -100,7 +101,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
         return { background: `rgba(${r},${g},${b},${a})` }
       })()
 
-  /* ── Textos dinâmicos do Slide 0 (legado) ── */
+  /* ── Textos legado ── */
   const eyebrow  = heroConfig?.eyebrow ?? 'Corretor de Imóveis · CRECI 000000'
   const rawWords = [
     heroConfig?.titulo_1 ?? 'O imóvel certo',
@@ -115,7 +116,6 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   const subtitulo = heroConfig?.subtitulo ?? 'Atendimento personalizado · Compra, venda e locação'
   const slide0Img = heroConfig?.url_imagem || '/images/banner.jpg'
 
-  /* ── Estilos inline dos botões (legado) ── */
   function hexRgbaOld(hex: string, alpha: number) {
     const [r, g, b] = hexRgb(hex); return `rgba(${r},${g},${b},${alpha})`
   }
@@ -131,10 +131,27 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   if (heroConfig?.btn2_peso)         btn2Style.fontWeight = heroConfig.btn2_peso
 
   /* ── Slides ── */
-  const allSlides = [
-    { url: slide0Img, branded: true },
-    ...banners.filter(b => !!b.url_imagem).map(b => ({ url: b.url_imagem, branded: false })),
+  type Slide = {
+    url:           string
+    branded:       boolean
+    tipo:          'hero' | 'png' | 'editavel'
+    camadas?:      HeroLayer[] | null
+    overlay_config?: HeroOverlayConfig | null
+  }
+
+  const allSlides: Slide[] = [
+    { url: slide0Img, branded: true, tipo: 'hero' },
+    ...banners
+      .filter(b => b.tipo === 'png' ? !!b.url_imagem : true)
+      .map(b => ({
+        url:           b.url_imagem || '',
+        branded:       false,
+        tipo:          b.tipo as 'png' | 'editavel',
+        camadas:       b.camadas,
+        overlay_config: b.overlay_config,
+      })),
   ]
+
   const [current, setCurrent] = useState(0)
   const [resetKey, setResetKey] = useState(0)
   const intervaloMs = (heroConfig?.intervalo ?? 5) * 1000
@@ -156,11 +173,13 @@ export default function Hero({ banners = [], heroConfig }: Props) {
     visible: { opacity: 1, y: 0, skewY: 0, transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] } },
   }
 
+  const slide = allSlides[current]
+
   return (
     <section className={styles.hero} ref={ref}>
 
       {/* ── Fundos ── */}
-      {allSlides.map((slide, i) => (
+      {allSlides.map((s, i) => (
         <motion.div
           key={`slide-${i}`}
           className={styles.bgWrap}
@@ -168,22 +187,27 @@ export default function Hero({ banners = [], heroConfig }: Props) {
           animate={{ opacity: i === current ? 1 : 0 }}
           transition={{ duration: 0.9, ease: 'easeInOut' }}
         >
-          <Image src={slide.url} alt="" fill priority={i === 0} className={styles.bgImage} sizes="100vw" />
+          {s.url && (
+            <Image src={s.url} alt="" fill priority={i === 0} className={styles.bgImage} sizes="100vw" />
+          )}
           <div
             className={styles.bgOverlay}
-            style={i === 0
-              ? (overlayStyle ?? { background: 'none' })
-              : { background: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.28) 60%, rgba(0,0,0,0.60) 100%)' }
+            style={
+              s.tipo === 'hero'
+                ? (overlayStyle ?? { background: 'none' })
+                : s.tipo === 'editavel'
+                  ? (overlayCss(s.overlay_config) ?? { background: 'none' })
+                  : { background: 'none' }
             }
           />
         </motion.div>
       ))}
 
-      {/* ── Camadas (novo sistema) ── */}
+      {/* ── Camadas do slide 0 (hero) ── */}
       <AnimatePresence>
-        {allSlides[current].branded && hasCamadas && (
+        {slide.tipo === 'hero' && hasCamadas && (
           <motion.div
-            key="layers"
+            key="hero-layers"
             className={styles.layersContainer}
             style={{ opacity }}
             initial={{ opacity: 0 }}
@@ -193,11 +217,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
           >
             {heroConfig!.camadas!.map((layer, idx) => (
               layer.tipo === 'botao' ? (
-                <a
-                  key={layer.id}
-                  href={layer.href || '#'}
-                  style={{ ...buttonLayerStyle(layer), zIndex: idx + 1 }}
-                >
+                <a key={layer.id} href={layer.href || '#'} style={{ ...buttonLayerStyle(layer), zIndex: idx + 1 }}>
                   {layer.texto}
                 </a>
               ) : (
@@ -210,9 +230,36 @@ export default function Hero({ banners = [], heroConfig }: Props) {
         )}
       </AnimatePresence>
 
-      {/* ── Conteúdo legado (apenas se não tiver camadas) ── */}
+      {/* ── Camadas de banners editáveis ── */}
       <AnimatePresence>
-        {allSlides[current].branded && !hasCamadas && (
+        {slide.tipo === 'editavel' && slide.camadas && slide.camadas.length > 0 && (
+          <motion.div
+            key={`editavel-layers-${current}`}
+            className={styles.layersContainer}
+            style={{ opacity }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {slide.camadas.map((layer, idx) => (
+              layer.tipo === 'botao' ? (
+                <a key={layer.id} href={layer.href || '#'} style={{ ...buttonLayerStyle(layer), zIndex: idx + 1 }}>
+                  {layer.texto}
+                </a>
+              ) : (
+                <div key={layer.id} style={{ ...layerStyle(layer), zIndex: idx + 1 }}>
+                  {layer.texto}
+                </div>
+              )
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Conteúdo legado (slide 0 sem camadas) ── */}
+      <AnimatePresence>
+        {slide.tipo === 'hero' && !hasCamadas && (
           <motion.div
             key="branded-content"
             className={styles.content}

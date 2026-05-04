@@ -7,6 +7,7 @@ import Reviews               from '@/components/Reviews/Reviews'
 import HighEnd               from '@/components/HighEnd/HighEnd'
 import Destaques             from '@/components/Destaques/Destaques'
 import About                 from '@/components/About/About'
+import CinemaSection         from '@/components/CinemaSection/CinemaSection'
 import CaptacaoSection       from '@/components/CaptacaoSection/CaptacaoSection'
 import NewsletterSection     from '@/components/NewsletterSection/NewsletterSection'
 import Footer                from '@/components/Footer/Footer'
@@ -51,7 +52,7 @@ export default async function Home() {
       .limit(6),
     supabase
       .from('banners')
-      .select('url_imagem')
+      .select('url_imagem, tipo, camadas, overlay_config')
       .eq('ativo', true)
       .order('ordem', { ascending: true })
       .limit(10),
@@ -88,6 +89,7 @@ export default async function Home() {
       <ExclusiveProperties imoveis={exclusivos ?? []} />
       <Reviews avaliacoes={avaliacoesData ?? []} />
       <HighEnd imoveis={altopadrao ?? []} />
+      <CinemaSection imageUrl={(perfilData as PerfilCorretor | null)?.foto_cinemascope_url} />
       <CaptacaoSection />
       <About perfil={perfilData as PerfilCorretor | null} />
       <NewsletterSection />

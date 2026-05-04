@@ -5,14 +5,19 @@ import Image                                                   from 'next/image'
 import { createBrowserClient }                                 from '@supabase/ssr'
 import { Banner, HeroConfig }                                  from '@/lib/types'
 import HeroEditor                                              from './HeroEditor'
+import BannerEditavelModal                                     from './BannerEditavelModal'
 import styles                                                  from './banners.module.css'
 
 export default function BannersPage() {
   const [banners,    setBanners]    = useState<Banner[]>([])
   const [heroConfig, setHeroConfig] = useState<HeroConfig | null>(null)
-  const [modalOpen,  setModalOpen]  = useState(false)
-  const [editing,    setEditing]    = useState<Banner | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [modalPng,     setModalPng]     = useState(false)
+  const [editingPng,   setEditingPng]   = useState<Banner | null>(null)
+  const [modalEditavel, setModalEditavel] = useState(false)
+  const [editingEditavel, setEditingEditavel] = useState<Banner | null>(null)
   const [busy,       setBusy]       = useState<string | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const supabase = useMemo(() => createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,6 +35,17 @@ export default function BannersPage() {
 
   useEffect(() => { fetchBanners() }, [fetchBanners])
 
+  /* Fecha o dropdown ao clicar fora */
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
   const toggleAtivo = async (banner: Banner) => {
     setBusy(banner.id)
     await supabase.from('banners').update({ ativo: !banner.ativo }).eq('id', banner.id)
@@ -40,25 +56,55 @@ export default function BannersPage() {
   const deleteBanner = async (banner: Banner) => {
     if (!confirm(`Excluir o banner "${banner.titulo ?? 'sem título'}"?`)) return
     setBusy(banner.id)
-    const fileName = banner.url_imagem.split('/').pop()
-    if (fileName) await supabase.storage.from('banners').remove([fileName])
+    if (banner.url_imagem) {
+      const fileName = banner.url_imagem.split('/').pop()?.split('?')[0]
+      if (fileName) await supabase.storage.from('banners').remove([fileName])
+    }
     await supabase.from('banners').delete().eq('id', banner.id)
     setBanners(b => b.filter(x => x.id !== banner.id))
     setBusy(null)
   }
 
-  const openNew    = () => { setEditing(null); setModalOpen(true) }
-  const openEdit   = (b: Banner) => { setEditing(b); setModalOpen(true) }
-  const closeModal = () => { setModalOpen(false); setEditing(null) }
+  const openNewPng = () => {
+    setEditingPng(null)
+    setModalPng(true)
+    setDropdownOpen(false)
+  }
+  const openNewEditavel = () => {
+    setEditingEditavel(null)
+    setModalEditavel(true)
+    setDropdownOpen(false)
+  }
+  const openEditBanner = (b: Banner) => {
+    if (b.tipo === 'editavel') {
+      setEditingEditavel(b)
+      setModalEditavel(true)
+    } else {
+      setEditingPng(b)
+      setModalPng(true)
+    }
+  }
 
-  const onSaved = (saved: Banner) => {
+  const onSavedPng = (saved: Banner) => {
     setBanners(prev => {
       const idx = prev.findIndex(x => x.id === saved.id)
       return idx >= 0
         ? prev.map(x => x.id === saved.id ? saved : x)
         : [...prev, saved]
     })
-    closeModal()
+    setModalPng(false)
+    setEditingPng(null)
+  }
+
+  const onSavedEditavel = (saved: Banner) => {
+    setBanners(prev => {
+      const idx = prev.findIndex(x => x.id === saved.id)
+      return idx >= 0
+        ? prev.map(x => x.id === saved.id ? saved : x)
+        : [...prev, saved]
+    })
+    setModalEditavel(false)
+    setEditingEditavel(null)
   }
 
   return (
@@ -68,7 +114,25 @@ export default function BannersPage() {
           <h1 className={styles.title}>Banners</h1>
           <p className={styles.count}>{banners.length} banner{banners.length !== 1 ? 's' : ''} cadastrado{banners.length !== 1 ? 's' : ''}</p>
         </div>
-        <button className={styles.btnNew} onClick={openNew}>+ Novo Banner</button>
+
+        {/* Botão com dropdown de tipo */}
+        <div className={styles.btnNewGroup} ref={dropdownRef}>
+          <button className={styles.btnNew} onClick={() => setDropdownOpen(o => !o)}>
+            + Novo Banner ▾
+          </button>
+          {dropdownOpen && (
+            <div className={styles.btnNewDropdown}>
+              <button className={styles.btnNewDropdownItem} onClick={openNewPng}>
+                <span className={styles.btnNewDropdownTitle}>Banner PNG</span>
+                <span className={styles.btnNewDropdownSub}>Upload de imagem com overlay fixo</span>
+              </button>
+              <button className={styles.btnNewDropdownItem} onClick={openNewEditavel}>
+                <span className={styles.btnNewDropdownTitle}>Banner Editável</span>
+                <span className={styles.btnNewDropdownSub}>Editor visual com camadas e película</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <HeroEditor
@@ -80,20 +144,26 @@ export default function BannersPage() {
       {banners.length === 0 ? (
         <div className={styles.empty}>
           <p>Nenhum banner cadastrado ainda.</p>
-          <button className={styles.btnNewEmpty} onClick={openNew}>Adicionar primeiro banner</button>
+          <button className={styles.btnNewEmpty} onClick={openNewPng}>Adicionar primeiro banner</button>
         </div>
       ) : (
         <div className={styles.grid}>
           {banners.map(b => (
             <div key={b.id} className={`${styles.card} ${!b.ativo ? styles.cardInativo : ''}`}>
               <div className={styles.cardThumb}>
-                <Image
-                  src={b.url_imagem}
-                  alt={b.titulo ?? 'Banner'}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 50vw"
-                  className={styles.cardImg}
-                />
+                {b.url_imagem ? (
+                  <Image
+                    src={b.url_imagem}
+                    alt={b.titulo ?? 'Banner'}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    className={styles.cardImg}
+                  />
+                ) : (
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--admin-text-4)', fontSize: '0.78rem' }}>
+                    Sem imagem de fundo
+                  </div>
+                )}
                 {!b.ativo && <div className={styles.inativoOverlay}>Inativo</div>}
               </div>
               <div className={styles.cardBody}>
@@ -101,6 +171,9 @@ export default function BannersPage() {
                   <p className={styles.cardTitulo}>{b.titulo ?? <span className={styles.sem}>Sem título</span>}</p>
                   {b.subtitulo && <p className={styles.cardSub}>{b.subtitulo}</p>}
                   <p className={styles.cardOrdem}>Ordem: {b.ordem}</p>
+                  <span className={`${styles.cardTipoBadge} ${b.tipo === 'editavel' ? styles.cardTipoBadgeEditavel : styles.cardTipoBadgePng}`}>
+                    {b.tipo === 'editavel' ? '✦ Editável' : 'PNG'}
+                  </span>
                 </div>
                 <div className={styles.cardActions}>
                   <button
@@ -110,7 +183,7 @@ export default function BannersPage() {
                   >
                     {b.ativo ? 'Ativo' : 'Inativo'}
                   </button>
-                  <button className={styles.btnEdit} onClick={() => openEdit(b)} disabled={busy === b.id}>
+                  <button className={styles.btnEdit} onClick={() => openEditBanner(b)} disabled={busy === b.id}>
                     Editar
                   </button>
                   <button className={styles.btnDelete} onClick={() => deleteBanner(b)} disabled={busy === b.id}>
@@ -123,22 +196,31 @@ export default function BannersPage() {
         </div>
       )}
 
-      {modalOpen && (
-        <BannerModal
-          banner={editing}
+      {modalPng && (
+        <BannerPngModal
+          banner={editingPng}
           supabase={supabase}
-          onClose={closeModal}
-          onSaved={onSaved}
+          onClose={() => { setModalPng(false); setEditingPng(null) }}
+          onSaved={onSavedPng}
           nextOrdem={banners.length}
+        />
+      )}
+
+      {modalEditavel && (
+        <BannerEditavelModal
+          banner={editingEditavel}
+          supabase={supabase}
+          onClose={() => { setModalEditavel(false); setEditingEditavel(null) }}
+          onSaved={onSavedEditavel}
         />
       )}
     </div>
   )
 }
 
-// ─── BannerModal ──────────────────────────────────────────────────────────────
+// ─── BannerPngModal ───────────────────────────────────────────────────────────
 
-interface ModalProps {
+interface PngModalProps {
   banner:    Banner | null
   supabase:  ReturnType<typeof createBrowserClient>
   onClose:   () => void
@@ -146,7 +228,7 @@ interface ModalProps {
   nextOrdem: number
 }
 
-function BannerModal({ banner, supabase, onClose, onSaved, nextOrdem }: ModalProps) {
+function BannerPngModal({ banner, supabase, onClose, onSaved, nextOrdem }: PngModalProps) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [titulo,    setTitulo]    = useState(banner?.titulo    ?? '')
   const [subtitulo, setSubtitulo] = useState(banner?.subtitulo ?? '')
@@ -176,7 +258,14 @@ function BannerModal({ banner, supabase, onClose, onSaved, nextOrdem }: ModalPro
       url = publicUrl
     }
 
-    const payload = { url_imagem: url, titulo: titulo || null, subtitulo: subtitulo || null, ordem, updated_at: new Date().toISOString() }
+    const payload = {
+      url_imagem: url,
+      titulo:     titulo || null,
+      subtitulo:  subtitulo || null,
+      ordem,
+      tipo:       'png' as const,
+      updated_at: new Date().toISOString(),
+    }
 
     if (banner) {
       const { data, error: err } = await supabase.from('banners').update(payload).eq('id', banner.id).select().single()
@@ -193,7 +282,7 @@ function BannerModal({ banner, supabase, onClose, onSaved, nextOrdem }: ModalPro
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>{banner ? 'Editar Banner' : 'Novo Banner'}</h2>
+          <h2 className={styles.modalTitle}>{banner ? 'Editar Banner PNG' : 'Novo Banner PNG'}</h2>
           <button className={styles.modalClose} onClick={onClose}>×</button>
         </div>
 

@@ -57,14 +57,17 @@ export interface Lead {
 }
 
 export interface Banner {
-  id:          string
-  titulo:      string | null
-  subtitulo:   string | null
-  url_imagem:  string
-  ordem:       number
-  ativo:       boolean
-  created_at:  string
-  updated_at:  string
+  id:              string
+  titulo:          string | null
+  subtitulo:       string | null
+  url_imagem:      string | null
+  ordem:           number
+  ativo:           boolean
+  tipo:            'png' | 'editavel'
+  camadas?:        HeroLayer[] | null
+  overlay_config?: HeroOverlayConfig | null
+  created_at:      string
+  updated_at:      string
 }
 
 export interface HeroLayer {
@@ -158,9 +161,10 @@ export interface PerfilCorretor {
   email:            string
   telefone:         string
   cidade_estado:    string
-  foto_url:         string | null
-  bio_1:            string | null
-  bio_2:            string | null
+  foto_url:              string | null
+  foto_cinemascope_url?: string | null
+  bio_1:                 string | null
+  bio_2:                 string | null
   anos_experiencia:  number
   imoveis_vendidos:  number
   avaliacao_google:  number
