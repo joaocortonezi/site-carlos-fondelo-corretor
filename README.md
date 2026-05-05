@@ -129,27 +129,6 @@ HeroEditor.tsx / BannerEditavelModal.tsx
   ├─ Drag-and-drop de camadas via PointerEvents + setPointerCapture
   ├─ LayerEditorShared.tsx — painel lateral de propriedades reutilizado por ambos
   └─ Salva camadas[] + overlay_config em JSONB no Supabase
-```
-
----
-
-## Variáveis de ambiente
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-
-# Resend (e-mail)
-RESEND_API_KEY=
-RESEND_FROM=                  # ex: Carlos Fondelo <contato@carlosfondelo.com.br>
-RESEND_NOTIFY_TO=             # e-mail do corretor para receber leads
-
-# Cloudinary (upload de fotos de imóveis)
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-```
 
 ---
 
