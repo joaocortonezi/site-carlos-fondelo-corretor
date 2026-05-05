@@ -3,18 +3,32 @@
 // Envia e-mail HTML formatado para o corretor (RESEND_NOTIFY_TO) via Resend.
 // Inclui botão de WhatsApp direto no e-mail para facilitar o retorno imediato.
 
-import { Resend }       from 'resend'
-import { NextResponse } from 'next/server'
+import { Resend }          from 'resend'
+import { NextResponse }    from 'next/server'
+import { escapeHtml }      from '@/lib/utils'
+import { assertSameOrigin } from '@/lib/api-guard'
 
 export async function POST(req: Request) {
+  const blocked = assertSameOrigin(req)
+  if (blocked) return blocked
+
+  if (!process.env.RESEND_API_KEY) return NextResponse.json({ skipped: true })
   const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { nome, telefone, email, mensagem, imovel_titulo, origem } = await req.json()
 
+    const safeNome     = escapeHtml(nome)
+    const safeTelefone = escapeHtml(telefone)
+    const safeEmail    = escapeHtml(email)
+    const safeMensagem = escapeHtml(mensagem)
+    const safeImovel   = escapeHtml(imovel_titulo)
+    const safeOrigem   = escapeHtml(origem)
+    const phoneDigits  = String(telefone ?? '').replace(/\D/g, '')
+
     await resend.emails.send({
       from:    process.env.RESEND_FROM!,
       to:      process.env.RESEND_NOTIFY_TO!,
-      subject: `Novo lead: ${nome}`,
+      subject: `Novo lead: ${safeNome}`,
       html: `
         <!DOCTYPE html>
         <html lang="pt-BR">
@@ -29,31 +43,31 @@ export async function POST(req: Request) {
               <table style="width:100%;border-collapse:collapse;font-size:14px">
                 <tr>
                   <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#7a7265;width:110px">Nome</td>
-                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18;font-weight:600">${nome}</td>
+                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18;font-weight:600">${safeNome}</td>
                 </tr>
                 <tr>
                   <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#7a7265">WhatsApp</td>
-                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18;font-weight:600">${telefone}</td>
+                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18;font-weight:600">${safeTelefone}</td>
                 </tr>
                 ${email ? `<tr>
                   <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#7a7265">E-mail</td>
-                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18">${email}</td>
+                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18">${safeEmail}</td>
                 </tr>` : ''}
                 ${imovel_titulo ? `<tr>
                   <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#7a7265">Imóvel</td>
-                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18">${imovel_titulo}</td>
+                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18">${safeImovel}</td>
                 </tr>` : ''}
                 ${mensagem ? `<tr>
                   <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#7a7265;vertical-align:top">Mensagem</td>
-                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18">${mensagem}</td>
+                  <td style="padding:10px 0;border-bottom:1px solid #f0efe9;color:#1c1b18">${safeMensagem}</td>
                 </tr>` : ''}
                 <tr>
                   <td style="padding:10px 0;color:#7a7265">Origem</td>
-                  <td style="padding:10px 0;color:#1c1b18">${origem}</td>
+                  <td style="padding:10px 0;color:#1c1b18">${safeOrigem}</td>
                 </tr>
               </table>
               <div style="margin-top:24px">
-                <a href="https://wa.me/55${telefone.replace(/\D/g, '')}" style="display:inline-block;background:#25d366;color:#fff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600">
+                <a href="https://wa.me/55${phoneDigits}" style="display:inline-block;background:#25d366;color:#fff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600">
                   Responder no WhatsApp
                 </a>
               </div>

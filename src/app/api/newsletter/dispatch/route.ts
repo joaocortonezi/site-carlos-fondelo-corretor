@@ -1,10 +1,14 @@
-import { Resend }       from 'resend'
-import { NextResponse } from 'next/server'
+import { Resend }        from 'resend'
+import { NextResponse }  from 'next/server'
+import { escapeHtml }    from '@/lib/utils'
+import { requireAdmin }  from '@/lib/api-guard'
 
 interface Recipient { email: string; nome: string | null }
 
 function makeHtml(nome: string | null, body: string) {
-  const greeting = nome ? `<p style="margin:0 0 16px">Olá, ${nome.trim().split(' ')[0]}!</p>` : ''
+  // Escapamos o nome do destinatário (vem do banco, originado de input público).
+  // Mantemos o body do admin sem escape para permitir formatação rica intencional.
+  const greeting = nome ? `<p style="margin:0 0 16px">Olá, ${escapeHtml(String(nome).trim().split(' ')[0])}!</p>` : ''
   const paragraphs = body
     .split('\n')
     .filter(l => l.trim())
@@ -32,6 +36,12 @@ function makeHtml(nome: string | null, body: string) {
 }
 
 export async function POST(req: Request) {
+  const auth = await requireAdmin()
+  if (auth instanceof NextResponse) return auth
+
+  if (!process.env.RESEND_API_KEY) {
+    return NextResponse.json({ ok: false, error: 'Resend não configurado neste ambiente.' }, { status: 503 })
+  }
   const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { subject, body, recipients }: {

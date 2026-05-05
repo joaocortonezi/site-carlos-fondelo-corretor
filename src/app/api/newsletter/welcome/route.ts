@@ -3,17 +3,27 @@
 // Envia e-mail de boas-vindas personalizado com o primeiro nome do inscrito.
 // Inclui CTA para a página de imóveis e instrução de como se descadastrar.
 
-import { Resend }       from 'resend'
-import { NextResponse } from 'next/server'
+import { Resend }          from 'resend'
+import { NextResponse }    from 'next/server'
+import { escapeHtml }      from '@/lib/utils'
+import { assertSameOrigin } from '@/lib/api-guard'
 
 export async function POST(req: Request) {
+  const blocked = assertSameOrigin(req)
+  if (blocked) return blocked
+
+  if (!process.env.RESEND_API_KEY) return NextResponse.json({ skipped: true })
   const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { email, nome } = await req.json()
-    if (!email) return NextResponse.json({ ok: false }, { status: 400 })
+    if (!email || typeof email !== 'string') return NextResponse.json({ ok: false }, { status: 400 })
+    // Valida formato do e-mail e bloqueia tentativas de header injection (\n, \r)
+    if (!/^[^\s@<>"',;:]+@[^\s@<>"',;:]+\.[^\s@<>"',;:]+$/.test(email)) {
+      return NextResponse.json({ ok: false }, { status: 400 })
+    }
 
-    const firstName = nome ? nome.trim().split(' ')[0] : null
-    const greeting  = firstName ? `Olá, ${firstName}!` : 'Olá!'
+    const firstName = nome ? String(nome).trim().split(' ')[0] : null
+    const greeting  = firstName ? `Olá, ${escapeHtml(firstName)}!` : 'Olá!'
 
     await resend.emails.send({
       from:    process.env.RESEND_FROM!,
