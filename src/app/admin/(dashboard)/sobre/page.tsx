@@ -161,6 +161,9 @@ function PerfilForm({ perfil, supabase, onSaved }: {
     anos_experiencia: perfil?.anos_experiencia  ?? 10,
     imoveis_vendidos: perfil?.imoveis_vendidos  ?? 200,
     avaliacao_google: perfil?.avaliacao_google  ?? 5.0,
+    mostrar_anos_experiencia: perfil?.mostrar_anos_experiencia ?? true,
+    mostrar_imoveis_vendidos: perfil?.mostrar_imoveis_vendidos ?? true,
+    mostrar_avaliacao_google: perfil?.mostrar_avaliacao_google ?? true,
   })
 
   const [preview,   setPreview]   = useState<string | null>(perfil?.foto_url ?? null)
@@ -183,11 +186,14 @@ function PerfilForm({ perfil, supabase, onSaved }: {
       anos_experiencia: perfil.anos_experiencia,
       imoveis_vendidos: perfil.imoveis_vendidos,
       avaliacao_google: perfil.avaliacao_google,
+      mostrar_anos_experiencia: perfil.mostrar_anos_experiencia ?? true,
+      mostrar_imoveis_vendidos: perfil.mostrar_imoveis_vendidos ?? true,
+      mostrar_avaliacao_google: perfil.mostrar_avaliacao_google ?? true,
     })
     setPreview(perfil.foto_url ?? null)
   }, [perfil])
 
-  const set = (k: keyof typeof form, v: string | number) =>
+  const set = (k: keyof typeof form, v: string | number | boolean) =>
     setForm(f => ({ ...f, [k]: v }))
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -337,30 +343,64 @@ function PerfilForm({ perfil, supabase, onSaved }: {
               <textarea className={styles.textarea} rows={3} value={form.bio_2} onChange={e => set('bio_2', e.target.value)} placeholder="Comprometido com transparência e resultados…" />
             </label>
 
-            <div className={styles.row}>
-              <label className={styles.label}>
-                Anos de experiência
-                <input className={styles.input} type="number" min={0} value={form.anos_experiencia} onChange={e => set('anos_experiencia', e.target.value)} />
-              </label>
-              <label className={styles.label}>
-                Imóveis vendidos
-                <input className={styles.input} type="number" min={0} value={form.imoveis_vendidos} onChange={e => set('imoveis_vendidos', e.target.value)} />
-              </label>
-              <label className={styles.label}>
-                Avaliação Google (estrelas)
-                <div className={styles.starsRow}>
+            <div className={styles.statsBlock}>
+              <div className={styles.statsHeader}>
+                <p className={styles.statsTitle}>Estatísticas exibidas no site</p>
+                <p className={styles.statsHint}>Desative qualquer item para escondê-lo da seção "Sobre mim". O layout se adapta automaticamente.</p>
+              </div>
+
+              <div className={styles.statRow}>
+                <Toggle
+                  checked={!!form.mostrar_anos_experiencia}
+                  onChange={v => set('mostrar_anos_experiencia', v)}
+                  label="Anos de experiência"
+                />
+                <input
+                  className={`${styles.input} ${styles.statInput} ${!form.mostrar_anos_experiencia ? styles.inputDisabled : ''}`}
+                  type="number"
+                  min={0}
+                  value={form.anos_experiencia}
+                  onChange={e => set('anos_experiencia', e.target.value)}
+                  disabled={!form.mostrar_anos_experiencia}
+                />
+              </div>
+
+              <div className={styles.statRow}>
+                <Toggle
+                  checked={!!form.mostrar_imoveis_vendidos}
+                  onChange={v => set('mostrar_imoveis_vendidos', v)}
+                  label="Imóveis vendidos"
+                />
+                <input
+                  className={`${styles.input} ${styles.statInput} ${!form.mostrar_imoveis_vendidos ? styles.inputDisabled : ''}`}
+                  type="number"
+                  min={0}
+                  value={form.imoveis_vendidos}
+                  onChange={e => set('imoveis_vendidos', e.target.value)}
+                  disabled={!form.mostrar_imoveis_vendidos}
+                />
+              </div>
+
+              <div className={styles.statRow}>
+                <Toggle
+                  checked={!!form.mostrar_avaliacao_google}
+                  onChange={v => set('mostrar_avaliacao_google', v)}
+                  label="Avaliação Google"
+                />
+                <div className={`${styles.starsRow} ${!form.mostrar_avaliacao_google ? styles.starsDisabled : ''}`}>
                   {[1, 2, 3, 4, 5].map(n => (
                     <button
                       key={n}
                       type="button"
                       className={`${styles.starBtn} ${Number(form.avaliacao_google) >= n ? styles.starActive : ''}`}
-                      onClick={() => set('avaliacao_google', n)}
+                      onClick={() => form.mostrar_avaliacao_google && set('avaliacao_google', n)}
+                      disabled={!form.mostrar_avaliacao_google}
                       aria-label={`${n} estrela${n > 1 ? 's' : ''}`}
                     >★</button>
                   ))}
                   <span className={styles.starsValue}>{Number(form.avaliacao_google).toFixed(1)}</span>
                 </div>
-              </label>
+              </div>
             </div>
           </div>
         </div>
@@ -375,6 +415,28 @@ function PersonIcon() {
       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
       <circle cx="12" cy="7" r="4"/>
     </svg>
+  )
+}
+
+// Toggle visual usado para controlar a visibilidade de cada estatística
+function Toggle({ checked, onChange, label }: {
+  checked:  boolean
+  onChange: (v: boolean) => void
+  label:    string
+}) {
+  return (
+    <label className={styles.toggleLabel}>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        className={`${styles.toggle} ${checked ? styles.toggleOn : ''}`}
+        onClick={() => onChange(!checked)}
+      >
+        <span className={styles.toggleThumb} />
+      </button>
+      <span className={styles.toggleText}>{label}</span>
+    </label>
   )
 }
 

@@ -216,6 +216,9 @@ export interface PerfilCorretor {
   anos_experiencia:  number
   imoveis_vendidos:  number
   avaliacao_google:  number       // 0–5
+  mostrar_anos_experiencia: boolean   // controla exibição na seção "Sobre mim"
+  mostrar_imoveis_vendidos: boolean
+  mostrar_avaliacao_google: boolean
   updated_at:        string
 }
 

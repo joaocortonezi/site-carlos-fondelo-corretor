@@ -53,6 +53,11 @@ export default function About({ perfil }: Props) {
   const vendidos        = perfil?.imoveis_vendidos ?? 200
   const avaliacaoGoogle = perfil?.avaliacao_google ?? 5
 
+  const showAnos      = perfil?.mostrar_anos_experiencia ?? true
+  const showVendidos  = perfil?.mostrar_imoveis_vendidos ?? true
+  const showAvaliacao = perfil?.mostrar_avaliacao_google ?? true
+  const visibleCount  = (showAnos ? 1 : 0) + (showVendidos ? 1 : 0) + (showAvaliacao ? 1 : 0)
+
   return (
     <section className={styles.section} id="sobre">
       <div className="container">
@@ -100,11 +105,13 @@ export default function About({ perfil }: Props) {
             <p className={styles.text}>{bio1}</p>
             <p className={styles.text}>{bio2}</p>
 
-            <div className={styles.stats}>
-              <AnimatedStat target={anos}            suffix=""  label="Anos de experiência" />
-              <AnimatedStat target={vendidos}        suffix=""  label="Imóveis vendidos"     />
-              <AnimatedStat target={avaliacaoGoogle} suffix="★" label="Avaliação Google"     />
-            </div>
+            {visibleCount > 0 && (
+              <div className={styles.stats} data-cols={visibleCount}>
+                {showAnos      && <AnimatedStat target={anos}            suffix=""  label="Anos de experiência" />}
+                {showVendidos  && <AnimatedStat target={vendidos}        suffix=""  label="Imóveis vendidos"     />}
+                {showAvaliacao && <AnimatedStat target={avaliacaoGoogle} suffix="★" label="Avaliação Google"     />}
+              </div>
+            )}
 
             <div className={styles.formBlock} id="contato">
               <p className={styles.formLabel}>Entre em contato</p>

@@ -73,6 +73,9 @@
   border-bottom: 1px solid var(--border);
   margin: 1.5rem 0 2rem;
 }
+.stats[data-cols='1'] { grid-template-columns: 1fr;        max-width: 280px; }
+.stats[data-cols='2'] { grid-template-columns: repeat(2, 1fr); max-width: 480px; }
+.stats[data-cols='3'] { grid-template-columns: repeat(3, 1fr); }
 .statItem { text-align: center; }
 .statNum {
   font-family: var(--font-display);
@@ -110,5 +113,8 @@
 @media (max-width: 768px) {
   .inner { grid-template-columns: 1fr; }
   .photoFrame { max-width: 240px; }
-  .stats { grid-template-columns: 1fr 1fr; }
+  .stats,
+  .stats[data-cols='3'] { grid-template-columns: 1fr 1fr; }
+  .stats[data-cols='1'] { grid-template-columns: 1fr; }
+  .stats[data-cols='2'] { grid-template-columns: 1fr 1fr; max-width: none; }
 }
