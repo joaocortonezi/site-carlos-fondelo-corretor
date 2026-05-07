@@ -3,9 +3,20 @@
 import { useState }  from 'react'
 import { motion }    from 'framer-motion'
 import { createBrowserClient } from '@supabase/ssr'
+import { CaptacaoConfig } from '@/lib/types'
 import styles        from './CaptacaoSection.module.css'
 
-export default function CaptacaoSection() {
+interface Props {
+  config?: CaptacaoConfig | null
+}
+
+export default function CaptacaoSection({ config }: Props) {
+  const eyebrow      = config?.eyebrow        ?? 'Para proprietários'
+  const tituloLinha1 = config?.titulo_linha_1 ?? 'Quer anunciar ou'
+  const tituloLinha2 = config?.titulo_linha_2 ?? 'alugar seu imóvel?'
+  const texto1       = config?.texto_1        ?? 'Faço a administração e gestão completa da venda ou locação do seu imóvel com muita responsabilidade e respeito, zelando e trabalhando para negociá-lo da melhor forma e pelo melhor preço possível.'
+  const texto2       = config?.texto_2        ?? 'Do primeiro contato à assinatura do contrato, cuido de cada detalhe para que você tenha tranquilidade e segurança em todo o processo.'
+
   const [form,   setForm]   = useState({ nome: '', email: '', telefone: '', intencao: '' as 'vender' | 'alugar' | '' })
   const [busy,   setBusy]   = useState(false)
   const [status, setStatus] = useState<'idle' | 'ok' | 'error'>('idle')
@@ -60,19 +71,12 @@ export default function CaptacaoSection() {
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className={styles.eyebrow}>Para proprietários</p>
+            <p className={styles.eyebrow}>{eyebrow}</p>
             <h2 className={styles.title}>
-              Quer anunciar ou<br />alugar seu imóvel?
+              {tituloLinha1}<br />{tituloLinha2}
             </h2>
-            <p className={styles.text}>
-              Faço a administração e gestão completa da venda ou locação do seu imóvel
-              com muita responsabilidade e respeito, zelando e trabalhando para
-              negociá-lo da melhor forma e pelo melhor preço possível.
-            </p>
-            <p className={styles.text}>
-              Do primeiro contato à assinatura do contrato, cuido de cada detalhe para
-              que você tenha tranquilidade e segurança em todo o processo.
-            </p>
+            <p className={styles.text}>{texto1}</p>
+            <p className={styles.text}>{texto2}</p>
           </motion.div>
 
           <motion.div

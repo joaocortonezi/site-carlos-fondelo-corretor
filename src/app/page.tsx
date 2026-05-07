@@ -16,12 +16,12 @@ import CaptacaoSection       from '@/components/CaptacaoSection/CaptacaoSection'
 import NewsletterSection     from '@/components/NewsletterSection/NewsletterSection'
 import Footer                from '@/components/Footer/Footer'
 import { createSupabaseServer } from '@/lib/supabase-server'
-import { PerfilCorretor }    from '@/lib/types'
+import { PerfilCorretor, CaptacaoConfig } from '@/lib/types'
 
 export default async function Home() {
   const supabase = await createSupabaseServer()
 
-  // Todas as 9 queries disparam ao mesmo tempo — não esperamos uma terminar para iniciar a outra
+  // Todas as queries disparam ao mesmo tempo — não esperamos uma terminar para iniciar a outra
   const [
     { data: exclusivos },
     { data: altopadrao },
@@ -32,6 +32,7 @@ export default async function Home() {
     { data: heroConfigData },
     { data: perfilData },
     { data: destaquesData },
+    { data: captacaoConfigData },
   ] = await Promise.all([
     // Imóveis exclusivos para a seção ExclusiveProperties
     supabase
@@ -105,6 +106,13 @@ export default async function Home() {
       .order('destaque',   { ascending: false })
       .order('created_at', { ascending: false })
       .limit(6),
+
+    // Textos editáveis da seção "Para proprietários"
+    supabase
+      .from('captacao_config')
+      .select('*')
+      .limit(1)
+      .maybeSingle(),
   ])
 
   // Deduplica e ordena os bairros para o select de busca
@@ -125,7 +133,7 @@ export default async function Home() {
       <HighEnd imoveis={altopadrao ?? []} />
       {/* Seção cinemascope (2.35:1) — só renderiza se foto_cinemascope_url estiver preenchida */}
       <CinemaSection imageUrl={(perfilData as PerfilCorretor | null)?.foto_cinemascope_url} />
-      <CaptacaoSection />
+      <CaptacaoSection config={captacaoConfigData as CaptacaoConfig | null} />
       <About perfil={perfilData as PerfilCorretor | null} />
       <NewsletterSection />
       <Footer perfil={perfilData as PerfilCorretor | null} />

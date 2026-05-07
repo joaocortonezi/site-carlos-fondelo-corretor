@@ -29,6 +29,7 @@ export default function AdminNav({ email }: Props) {
     { href: '/admin/banners',    label: 'Banners',    icon: <BannerIcon /> },
     { href: '/admin/avaliacoes', label: 'Avaliações', icon: <StarIcon /> },
     { href: '/admin/sobre',          label: 'Sobre mim',     icon: <PersonIcon /> },
+    { href: '/admin/captacao',       label: 'Captação',      icon: <MegaphoneIcon /> },
     { href: '/admin/configuracoes',  label: 'Configurações', icon: <SettingsIcon /> },
   ]
 
@@ -96,6 +97,16 @@ function PersonIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
       <circle cx="12" cy="7" r="4"/>
+    </svg>
+  )
+}
+
+function MegaphoneIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 11v2a1 1 0 001 1h2l5 4V6L6 10H4a1 1 0 00-1 1z"/>
+      <path d="M15 8a4 4 0 010 8"/>
+      <path d="M18 5a8 8 0 010 14"/>
     </svg>
   )
 }

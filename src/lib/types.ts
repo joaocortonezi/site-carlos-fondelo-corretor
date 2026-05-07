@@ -222,6 +222,22 @@ export interface PerfilCorretor {
   updated_at:        string
 }
 
+// ─── Captação (Para Proprietários) ────────────────────────────────────────────
+
+/**
+ * Textos da seção "Para proprietários" (tabela `captacao_config`, 1 linha).
+ * Editáveis pelo admin para personalizar a chamada de captação de imóveis.
+ */
+export interface CaptacaoConfig {
+  id:             string
+  eyebrow:        string
+  titulo_linha_1: string
+  titulo_linha_2: string
+  texto_1:        string
+  texto_2:        string
+  updated_at:     string
+}
+
 // ─── Notas de Leads ───────────────────────────────────────────────────────────
 
 /** Anotação interna sobre um lead (tabela `lead_notas`). */
