@@ -6,13 +6,6 @@ import { createBrowserClient }     from '@supabase/ssr'
 import { Avaliacao }               from '@/lib/types'
 import styles                      from './Reviews.module.css'
 
-/* Static fallback usado enquanto nenhuma avaliação estiver no banco */
-const FALLBACK = [
-  { id: '1', nome: 'Maria A.',    texto: 'Atendimento excelente! Encontrou o imóvel perfeito para a minha família. Profissional, atencioso e muito honesto em todas as etapas.', via: 'via Google · mai/2025', estrelas: 5 },
-  { id: '2', nome: 'Ricardo S.',  texto: 'Vendi meu apartamento em 3 semanas pelo valor pedido. O Carlos conhece o mercado de verdade e sabe conduzir uma negociação com segurança.', via: 'via Google · abr/2025', estrelas: 5 },
-  { id: '3', nome: 'Julia P.',    texto: 'Terceira compra com o Carlos. Simplesmente não vejo motivo para trabalhar com outro corretor. Confiança e resultado garantido.', via: 'via Google · mar/2025', estrelas: 5 },
-]
-
 interface ReviewRow {
   id:       string
   nome:     string
@@ -40,7 +33,8 @@ interface Props {
 export default function Reviews({ avaliacoes }: Props) {
   const [formOpen, setFormOpen] = useState(false)
 
-  const rows: ReviewRow[] = (avaliacoes && avaliacoes.length > 0) ? avaliacoes : FALLBACK
+  const rows: ReviewRow[] = avaliacoes ?? []
+  const hasReviews = rows.length > 0
 
   return (
     <section className={styles.section} id="avaliacoes">
@@ -53,37 +47,51 @@ export default function Reviews({ avaliacoes }: Props) {
           transition={{ duration: 0.6 }}
         >
           <h2 className={styles.title}>O que dizem os clientes</h2>
-          <div className={styles.rating}>
-            <span className={styles.stars} aria-label="5 estrelas">★★★★★</span>
-            <span className={styles.score}>5,0</span>
-            <span className={styles.count}>· {rows.length} avaliação{rows.length !== 1 ? 'ões' : ''}</span>
-          </div>
+          {hasReviews && (
+            <div className={styles.rating}>
+              <span className={styles.stars} aria-label="5 estrelas">★★★★★</span>
+              <span className={styles.score}>5,0</span>
+              <span className={styles.count}>· {rows.length} avaliação{rows.length !== 1 ? 'ões' : ''}</span>
+            </div>
+          )}
         </motion.div>
 
-        <motion.div
-          className={styles.grid}
-          variants={stagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-        >
-          {rows.map(r => (
-            <motion.div key={r.id} className={styles.card} variants={cardVariant} whileHover={{ y: -4 }}>
-              <span className={styles.quoteMark} aria-hidden="true">&quot;</span>
-              <div className={styles.author}>
-                <div className={styles.avatar}>{initials(r.nome)}</div>
-                <div>
-                  <p className={styles.name}>{r.nome}</p>
-                  <p className={styles.authorStars} aria-label={`${r.estrelas} estrelas`}>
-                    {'★'.repeat(r.estrelas)}{'☆'.repeat(5 - r.estrelas)}
-                  </p>
+        {hasReviews ? (
+          <motion.div
+            className={styles.grid}
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-40px' }}
+          >
+            {rows.map(r => (
+              <motion.div key={r.id} className={styles.card} variants={cardVariant} whileHover={{ y: -4 }}>
+                <span className={styles.quoteMark} aria-hidden="true">&quot;</span>
+                <div className={styles.author}>
+                  <div className={styles.avatar}>{initials(r.nome)}</div>
+                  <div>
+                    <p className={styles.name}>{r.nome}</p>
+                    <p className={styles.authorStars} aria-label={`${r.estrelas} estrelas`}>
+                      {'★'.repeat(r.estrelas)}{'☆'.repeat(5 - r.estrelas)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <p className={styles.text}>&quot;{r.texto}&quot;</p>
-              {r.via && <p className={styles.via}>{r.via}</p>}
-            </motion.div>
-          ))}
-        </motion.div>
+                <p className={styles.text}>&quot;{r.texto}&quot;</p>
+                {r.via && <p className={styles.via}>{r.via}</p>}
+              </motion.div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.p
+            className={styles.emptyState}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            Seja o primeiro a compartilhar sua experiência.
+          </motion.p>
+        )}
 
         <motion.div
           className={styles.ctaWrap}

@@ -79,6 +79,16 @@
 }
 .via { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.08em; }
 
+.emptyState {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin: 0 0 2rem;
+  padding: 2rem 0;
+}
+
 .ctaWrap { display: flex; justify-content: center; }
 .ctaBtn {
   border: 1px solid var(--border-gold);
