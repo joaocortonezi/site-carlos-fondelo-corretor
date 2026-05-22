@@ -5,6 +5,7 @@ import { useRouter }                   from 'next/navigation'
 import Image                           from 'next/image'
 import { createBrowserClient }         from '@supabase/ssr'
 import { Imovel, FotoImovel }          from '@/lib/types'
+import { generateSlug }                from '@/lib/utils'
 import styles                          from './form.module.css'
 
 interface Props { imovel?: Imovel }
@@ -18,6 +19,16 @@ const SITUACOES   = [
   { value: 'usado',      label: 'Usado' },
 ] as const
 
+// Definido fora do componente: declarar dentro causaria remount dos inputs
+// a cada keystroke (React vê uma função nova a cada render).
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className={styles.field}>
+      <label className={styles.label}>{label}</label>
+      {children}
+    </div>
+  )
+}
 
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -92,6 +103,7 @@ export default function ImovelForm({ imovel }: Props) {
 
   const [form, setForm] = useState({
     titulo:     imovel?.titulo     ?? '',
+    subtitulo:  imovel?.subtitulo  ?? '',
     tipo:       imovel?.tipo       ?? 'apartamento',
     status:     imovel?.status     ?? 'disponivel',
     referencia: imovel?.referencia ?? '',
@@ -286,9 +298,21 @@ export default function ImovelForm({ imovel }: Props) {
 
     let imovelId = imovel?.id
 
+    // Slug a partir de título + cidade + referência (referência garante unicidade).
+    // Preserva o slug existente em edição se título/cidade não mudaram, para não
+    // quebrar URLs já indexadas.
+    const baseSlug = generateSlug(form.titulo, form.cidade)
+    const refSuffix = (form.referencia || '').toLowerCase().replace(/[^a-z0-9-]/g, '')
+    const computedSlug = refSuffix ? `${baseSlug}-${refSuffix}` : baseSlug
+    const slug = (isEdit && imovel?.slug && imovel.slug.length > 0)
+      ? imovel.slug
+      : computedSlug
+
     // Payload sem vídeos — são tratados separadamente após upload
     const payload = {
       titulo:     form.titulo,
+      subtitulo:  form.subtitulo.trim() || null,
+      slug,
       tipo:       form.tipo,
       finalidade: getFinalidade(),
       status:     form.status,
@@ -377,13 +401,6 @@ export default function ImovelForm({ imovel }: Props) {
     router.refresh()
   }
 
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div className={styles.field}>
-      <label className={styles.label}>{label}</label>
-      {children}
-    </div>
-  )
-
   const progressPct = uploadTotal > 0 ? Math.round((uploadStep / uploadTotal) * 100) : null
 
   return (
@@ -407,6 +424,15 @@ export default function ImovelForm({ imovel }: Props) {
             />
           </Field>
         </div>
+        <Field label="Breve subtítulo (opcional)">
+          <input
+            className={styles.input}
+            value={form.subtitulo}
+            onChange={e => set('subtitulo', e.target.value)}
+            maxLength={120}
+            placeholder='Ex.: "Próximo ao centro · com vista para o parque"'
+          />
+        </Field>
         <div className={styles.grid4}>
           <Field label="Tipo *">
             <select className={styles.select} value={form.tipo} onChange={e => set('tipo', e.target.value)}>

@@ -1,6 +1,6 @@
-import Nav    from '@/components/Nav/Nav'
-import Footer from '@/components/Footer/Footer'
-import styles  from '../politica-de-privacidade/legal.module.css'
+import Nav        from '@/components/Nav/Nav'
+import SiteFooter from '@/components/Footer/SiteFooter'
+import styles     from '../politica-de-privacidade/legal.module.css'
 
 export const metadata = {
   title:       'Termos de Uso — Carlos Fondelo Corretor',
@@ -109,7 +109,7 @@ export default function TermosDeUso() {
           </div>
         </div>
       </main>
-      <Footer />
+      <SiteFooter />
     </>
   )
 }

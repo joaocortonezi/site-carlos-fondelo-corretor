@@ -1,6 +1,6 @@
-import Nav    from '@/components/Nav/Nav'
-import Footer from '@/components/Footer/Footer'
-import styles from './obrigado.module.css'
+import Nav        from '@/components/Nav/Nav'
+import SiteFooter from '@/components/Footer/SiteFooter'
+import styles     from './obrigado.module.css'
 
 export const metadata = { title: 'Obrigado — Carlos Fondelo Corretor' }
 
@@ -32,7 +32,7 @@ export default function ObrigadoPage() {
           <a href="/" className={styles.btnBack}>← Voltar ao site</a>
         </div>
       </main>
-      <Footer />
+      <SiteFooter />
     </>
   )
 }

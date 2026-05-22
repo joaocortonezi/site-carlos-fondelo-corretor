@@ -15,6 +15,7 @@ export interface Imovel {
   slug:        string | null        // URL amigável gerada a partir do título + cidade
   referencia:  string | null        // código interno do corretor
   titulo:      string
+  subtitulo:   string | null        // breve linha exibida abaixo do título (máx 120)
   descricao:   string | null
   tipo:        ImovelTipo
   finalidade:  ImovelFinalidade

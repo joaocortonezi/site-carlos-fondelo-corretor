@@ -11,7 +11,8 @@ interface Props {
 
 export default function ImovelCard({ imovel, size = 'default' }: Props) {
   const foto = imovel.fotos?.sort((a, b) => a.ordem - b.ordem)[0]?.url
-  const href = `/imoveis/${imovel.slug ?? imovel.id}`
+  // `||` em vez de `??`: slug pode ser string vazia em imóveis legados
+  const href = `/imoveis/${imovel.slug || imovel.id}`
 
   return (
     <Link href={href} className={`${styles.card} ${styles[size]}`}>

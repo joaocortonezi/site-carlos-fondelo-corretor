@@ -56,6 +56,13 @@
   line-height: 1.2;
   margin-bottom: 0.4rem;
 }
+.subtitulo {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-soft);
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+}
 .location {
   font-size: 0.78rem;
   color: var(--text-muted);

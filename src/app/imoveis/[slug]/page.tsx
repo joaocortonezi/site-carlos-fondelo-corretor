@@ -5,34 +5,49 @@ import FotoGaleria              from '@/components/FotoGaleria/FotoGaleria'
 import LeadForm                 from '@/components/LeadForm/LeadForm'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { formatPrice, formatArea } from '@/lib/utils'
+import { PerfilCorretor }       from '@/lib/types'
 import styles                   from './imovel.module.css'
 
 interface PageProps { params: Promise<{ slug: string }> }
 
+// UUID v4 — usado para distinguir slug textual de id UUID em URLs legadas
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+async function findImovel(slug: string) {
+  const supabase = await createSupabaseServer()
+  const column   = UUID_REGEX.test(slug) ? 'id' : 'slug'
+  const { data } = await supabase
+    .from('imoveis')
+    .select('*, fotos:fotos_imoveis(id, url, ordem)')
+    .eq(column, slug)
+    .eq('status', 'disponivel')
+    .maybeSingle()
+  return data
+}
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params
-  const supabase  = await createSupabaseServer()
-  const { data }  = await supabase
-    .from('imoveis').select('titulo, descricao, bairro, cidade').eq('slug', slug).single()
+  const data = await findImovel(slug)
   if (!data) return {}
   return {
     title:       `${data.titulo} — Carlos Fondelo Corretor`,
-    description: data.descricao ?? `${data.titulo} em ${data.bairro ?? data.cidade}`,
+    description: data.subtitulo ?? data.descricao ?? `${data.titulo} em ${data.bairro ?? data.cidade}`,
   }
 }
 
 export default async function ImovelPage({ params }: PageProps) {
   const { slug } = await params
-  const supabase  = await createSupabaseServer()
-
-  const { data: imovel } = await supabase
-    .from('imoveis')
-    .select('*, fotos:fotos_imoveis(id, url, ordem)')
-    .eq('slug', slug)
-    .eq('status', 'disponivel')
-    .single()
+  const imovel = await findImovel(slug)
 
   if (!imovel) notFound()
+
+  const supabase = await createSupabaseServer()
+  const { data: perfilData } = await supabase
+    .from('perfil_corretor')
+    .select('*')
+    .limit(1)
+    .maybeSingle()
+  const perfil = perfilData as PerfilCorretor | null
 
   const fotos  = (imovel.fotos ?? []).sort((a: {ordem:number}, b: {ordem:number}) => a.ordem - b.ordem)
   const tipoMap: Record<string, string> = {
@@ -69,6 +84,9 @@ export default async function ImovelPage({ params }: PageProps) {
                 </div>
 
                 <h1 className={styles.titulo}>{imovel.titulo}</h1>
+                {imovel.subtitulo && (
+                  <p className={styles.subtitulo}>{imovel.subtitulo}</p>
+                )}
                 <p className={styles.location}>
                   {[imovel.bairro, imovel.cidade, imovel.estado].filter(Boolean).join(' · ')}
                 </p>
@@ -104,8 +122,8 @@ export default async function ImovelPage({ params }: PageProps) {
                 {imovel.referencia && (
                   <p className={styles.ctaRef}>Ref: {imovel.referencia}</p>
                 )}
-                <p className={styles.ctaName}>Carlos Fondelo</p>
-                <p className={styles.ctaCreci}>CRECI · 000000</p>
+                <p className={styles.ctaName}>{perfil?.nome ?? 'Carlos Fondelo'}</p>
+                {perfil?.creci && <p className={styles.ctaCreci}>CRECI · {perfil.creci}</p>}
                 <p className={styles.ctaFormLabel}>Tenho interesse neste imóvel</p>
                 <LeadForm
                   imovelId={imovel.id}
@@ -117,7 +135,7 @@ export default async function ImovelPage({ params }: PageProps) {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer perfil={perfil} />
     </>
   )
 }
