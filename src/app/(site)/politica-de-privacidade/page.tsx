@@ -1,6 +1,5 @@
-import Nav        from '@/components/Nav/Nav'
-import SiteFooter from '@/components/Footer/SiteFooter'
-import styles     from './legal.module.css'
+import Nav    from '@/components/Nav/Nav'
+import styles from './legal.module.css'
 
 export const metadata = {
   title:       'Política de Privacidade — Carlos Fondelo Corretor',
@@ -131,7 +130,6 @@ export default function PoliticaDePrivacidade() {
           </div>
         </div>
       </main>
-      <SiteFooter />
     </>
   )
 }

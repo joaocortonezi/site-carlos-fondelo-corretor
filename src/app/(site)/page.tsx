@@ -14,7 +14,6 @@ import About                 from '@/components/About/About'
 import CinemaSection         from '@/components/CinemaSection/CinemaSection'
 import CaptacaoSection       from '@/components/CaptacaoSection/CaptacaoSection'
 import NewsletterSection     from '@/components/NewsletterSection/NewsletterSection'
-import Footer                from '@/components/Footer/Footer'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { PerfilCorretor, CaptacaoConfig } from '@/lib/types'
 
@@ -136,7 +135,6 @@ export default async function Home() {
       <CaptacaoSection config={captacaoConfigData as CaptacaoConfig | null} />
       <About perfil={perfilData as PerfilCorretor | null} />
       <NewsletterSection />
-      <Footer perfil={perfilData as PerfilCorretor | null} />
     </>
   )
 }

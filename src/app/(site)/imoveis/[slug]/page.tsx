@@ -1,6 +1,5 @@
 import { notFound }             from 'next/navigation'
 import Nav                      from '@/components/Nav/Nav'
-import Footer                   from '@/components/Footer/Footer'
 import FotoGaleria              from '@/components/FotoGaleria/FotoGaleria'
 import LeadForm                 from '@/components/LeadForm/LeadForm'
 import { createSupabaseServer } from '@/lib/supabase-server'
@@ -135,7 +134,6 @@ export default async function ImovelPage({ params }: PageProps) {
           </div>
         </div>
       </main>
-      <Footer perfil={perfil} />
     </>
   )
 }

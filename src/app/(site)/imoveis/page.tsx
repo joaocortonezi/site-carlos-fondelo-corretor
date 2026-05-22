@@ -1,6 +1,5 @@
 import { Suspense }             from 'react'
 import Nav                      from '@/components/Nav/Nav'
-import SiteFooter               from '@/components/Footer/SiteFooter'
 import ImovelCard               from '@/components/ImovelCard/ImovelCard'
 import ImovelFiltros            from './ImovelFiltros'
 import { createSupabaseServer } from '@/lib/supabase-server'
@@ -113,7 +112,6 @@ export default async function ImoveisPage({ searchParams }: PageProps) {
           )}
         </div>
       </main>
-      <SiteFooter />
     </>
   )
 }
