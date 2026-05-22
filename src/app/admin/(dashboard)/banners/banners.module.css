@@ -409,7 +409,7 @@
   background:    var(--admin-card);
   border-radius: 10px;
   width:         100%;
-  max-width:     540px;
+  max-width:     720px;
   max-height:    90vh;
   overflow-y:    auto;
   box-shadow:    0 8px 32px rgba(0,0,0,0.18);
@@ -468,6 +468,48 @@
   transition:    border-color 0.2s;
 }
 .uploadArea:hover { border-color: var(--gold); }
+
+/* Mobile preview: proporção retrato (9:16) */
+.uploadAreaMobile { aspect-ratio: 9/16; }
+
+/* Variantes desktop + mobile lado a lado */
+.variantsGrid {
+  display:               grid;
+  grid-template-columns: 2fr 1fr;
+  gap:                   1rem;
+  align-items:           start;
+}
+@media (max-width: 640px) {
+  .variantsGrid { grid-template-columns: 1fr; }
+}
+.variantBlock {
+  display:        flex;
+  flex-direction: column;
+  gap:            0.4rem;
+}
+.variantLabel {
+  font-size:      0.7rem;
+  font-weight:    700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--admin-text-3);
+}
+.variantSub {
+  font-size: 0.66rem;
+  color:     var(--admin-text-4);
+}
+.variantRemoveBtn {
+  align-self:    flex-start;
+  font-size:     0.66rem;
+  font-weight:   600;
+  padding:       0.2rem 0.55rem;
+  border-radius: 4px;
+  border:        none;
+  background:    var(--action-delete-bg);
+  color:         var(--action-delete-fg);
+  cursor:        pointer;
+}
+.variantRemoveBtn:hover { background: var(--action-delete-hover); }
 
 .uploadPlaceholder {
   width:           100%;

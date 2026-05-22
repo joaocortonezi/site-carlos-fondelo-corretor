@@ -5,8 +5,12 @@
 // Técnica de drag: PointerEvents + setPointerCapture permite arrastar camadas
 // mesmo que o cursor saia do elemento durante o movimento rápido.
 //
-// Canvas proporcional a 1440px: a escala (canvasW/1440) é aplicada via font-size
-// no container, fazendo que rem escale automaticamente com o canvas.
+// Canvas proporcional: desktop 1440px (aspect 16:9) / mobile 390px (aspect 9:16).
+// A escala é canvasW / canvasBase, aplicada via font-size, fazendo que rem
+// escale automaticamente com o canvas.
+//
+// Suporta variantes desktop e mobile separadas. Defaults legados só populam o
+// desktop quando ainda não há camadas — mobile começa vazio (fallback no site).
 
 'use client'
 
@@ -16,7 +20,7 @@ import { createBrowserClient }                        from '@supabase/ssr'
 import { HeroConfig, HeroLayer, HeroOverlayConfig }   from '@/lib/types'
 import { DEFAULT_FONT }                               from '@/lib/hero-fonts'
 import {
-  uid, hexRgb, overlayCssStr, paradasValidas,
+  uid, hexRgb, overlayCssStr,
   LayersTab, BackgroundTab,
 } from './LayerEditorShared'
 import styles from './HeroEditor.module.css'
@@ -94,7 +98,14 @@ function makeDefaultOverlay(_c: HeroConfig | null): HeroOverlayConfig {
   return { tipo: 'nenhum' }
 }
 
+// Clona um conjunto de camadas atribuindo novos IDs — usado pelo Copiar Desktop → Mobile
+function cloneLayers(src: HeroLayer[]): HeroLayer[] {
+  return src.map(l => ({ ...l, id: uid() }))
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
+
+type Viewport = 'desktop' | 'mobile'
 
 interface Props {
   config:   HeroConfig | null
@@ -107,33 +118,60 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
   const fileRef    = useRef<HTMLInputElement>(null)
   const dragRef    = useRef<{ layerId: string; sx: number; sy: number; lx: number; ly: number } | null>(null)
 
-  const [layers,    setLayers]    = useState<HeroLayer[]>(() =>
-    config?.camadas && config.camadas.length > 0
-      ? config.camadas
-      : makeDefaultLayers(config)
+  // ── Variante desktop ── (segue defaults legados se não houver camadas salvas)
+  const [layersDesktop,    setLayersDesktop]    = useState<HeroLayer[]>(() =>
+    config?.camadas && config.camadas.length > 0 ? config.camadas : makeDefaultLayers(config)
   )
-  const [overlay,   setOverlay]   = useState<HeroOverlayConfig>(() =>
+  const [overlayDesktop,   setOverlayDesktop]   = useState<HeroOverlayConfig>(() =>
     config?.overlay_config ?? makeDefaultOverlay(config)
   )
-  const [bgPreview, setBgPreview] = useState<string | null>(config?.url_imagem ?? null)
-  const [bgFile,    setBgFile]    = useState<File | null>(null)
+  const [bgPreviewDesktop, setBgPreviewDesktop] = useState<string | null>(config?.url_imagem ?? null)
+  const [bgFileDesktop,    setBgFileDesktop]    = useState<File | null>(null)
+
+  // ── Variante mobile ── (começa vazia — defaults só populam desktop)
+  const [layersMobile,    setLayersMobile]    = useState<HeroLayer[]>(() =>
+    config?.camadas_mobile && config.camadas_mobile.length > 0 ? config.camadas_mobile : []
+  )
+  const [overlayMobile,   setOverlayMobile]   = useState<HeroOverlayConfig>(() =>
+    config?.overlay_config_mobile ?? { tipo: 'nenhum' }
+  )
+  const [bgPreviewMobile, setBgPreviewMobile] = useState<string | null>(config?.url_imagem_mobile ?? null)
+  const [bgFileMobile,    setBgFileMobile]    = useState<File | null>(null)
+  const [removeBgMobile,  setRemoveBgMobile]  = useState(false)
+
+  const [viewport,   setViewport]   = useState<Viewport>('desktop')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [tab,       setTab]       = useState<'camadas' | 'fundo'>('camadas')
-  const [canvasW,   setCanvasW]   = useState(900)
-  const [busy,      setBusy]      = useState(false)
-  const [saved,     setSaved]     = useState(false)
-  const [error,     setError]     = useState('')
+  const [tab,        setTab]        = useState<'camadas' | 'fundo'>('camadas')
+  const [canvasW,    setCanvasW]    = useState(900)
+  const [busy,       setBusy]       = useState(false)
+  const [saved,      setSaved]      = useState(false)
+  const [error,      setError]      = useState('')
+
+  // Proxies por viewport
+  const layers     = viewport === 'desktop' ? layersDesktop    : layersMobile
+  const overlay    = viewport === 'desktop' ? overlayDesktop   : overlayMobile
+  const bgPreview  = viewport === 'desktop' ? bgPreviewDesktop : bgPreviewMobile
+  const setLayers  = viewport === 'desktop' ? setLayersDesktop : setLayersMobile
+  const setOverlay = viewport === 'desktop' ? setOverlayDesktop : setOverlayMobile
+
+  const canvasBase = viewport === 'desktop' ? 1440 : 390
+  const scale      = canvasW / canvasBase
+
+  useEffect(() => { setSelectedId(null) }, [viewport])
 
   useEffect(() => {
     if (!config) return
-    setLayers(
-      config.camadas && config.camadas.length > 0
-        ? config.camadas
-        : makeDefaultLayers(config)
+    setLayersDesktop(
+      config.camadas && config.camadas.length > 0 ? config.camadas : makeDefaultLayers(config)
     )
-    setOverlay(config.overlay_config ?? makeDefaultOverlay(config))
-    setBgPreview(config.url_imagem ?? null)
-    setBgFile(null)
+    setOverlayDesktop(config.overlay_config ?? makeDefaultOverlay(config))
+    setBgPreviewDesktop(config.url_imagem ?? null)
+    setBgFileDesktop(null)
+    setLayersMobile(config.camadas_mobile && config.camadas_mobile.length > 0 ? config.camadas_mobile : [])
+    setOverlayMobile(config.overlay_config_mobile ?? { tipo: 'nenhum' })
+    setBgPreviewMobile(config.url_imagem_mobile ?? null)
+    setBgFileMobile(null)
+    setRemoveBgMobile(false)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config?.id])
 
@@ -141,13 +179,11 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
     const obs = new ResizeObserver(es => setCanvasW(es[0].contentRect.width))
     if (canvasRef.current) obs.observe(canvasRef.current)
     return () => obs.disconnect()
-  }, [])
-
-  const scale = canvasW / 1440
+  }, [viewport])
 
   const updateLayer = useCallback((id: string, patch: Partial<HeroLayer>) => {
     setLayers(prev => prev.map(l => l.id === id ? { ...l, ...patch } : l))
-  }, [])
+  }, [setLayers])
 
   const addLayer = (tipo: 'texto' | 'botao') => {
     const base: HeroLayer = tipo === 'texto' ? {
@@ -182,6 +218,14 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
       ;[next[idx], next[idx + dir]] = [next[idx + dir], next[idx]]
       return next
     })
+  }
+
+  const copyDesktopToMobile = () => {
+    if (layersDesktop.length === 0 && overlayDesktop.tipo === 'nenhum') return
+    if (layersMobile.length > 0 && !confirm('Substituir o layout mobile atual pelo do desktop?')) return
+    setLayersMobile(cloneLayers(layersDesktop))
+    setOverlayMobile(JSON.parse(JSON.stringify(overlayDesktop)) as HeroOverlayConfig)
+    setSelectedId(null)
   }
 
   const onLayerPointerDown = (e: React.PointerEvent, id: string) => {
@@ -260,29 +304,73 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
 
   const handleBgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
-    setBgFile(f)
-    setBgPreview(URL.createObjectURL(f))
+    if (viewport === 'desktop') {
+      setBgFileDesktop(f); setBgPreviewDesktop(URL.createObjectURL(f))
+    } else {
+      setBgFileMobile(f); setBgPreviewMobile(URL.createObjectURL(f))
+      setRemoveBgMobile(false)
+    }
+  }
+
+  const clearBgMobile = () => {
+    setBgFileMobile(null); setBgPreviewMobile(null); setRemoveBgMobile(true)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  // Upload do bg; desktop usa upsert no nome fixo `hero-principal.<ext>` (legado),
+  // mobile usa nome com timestamp (não conflita com banners).
+  const uploadDesktopBg = async (f: File): Promise<string | null> => {
+    const ext = f.name.split('.').pop() ?? 'jpg'
+    await supabase.storage.from('banners').remove([`hero-principal.${ext}`])
+    const { error: upErr } = await supabase.storage
+      .from('banners').upload(`hero-principal.${ext}`, f, { cacheControl: '3600', upsert: true })
+    if (upErr) { setError(upErr.message); return null }
+    const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(`hero-principal.${ext}`)
+    return `${publicUrl}?t=${Date.now()}`
+  }
+  const uploadMobileBg = async (f: File): Promise<string | null> => {
+    const ext = f.name.split('.').pop() ?? 'jpg'
+    const name = `hero-principal-mobile.${ext}`
+    await supabase.storage.from('banners').remove([name])
+    const { error: upErr } = await supabase.storage
+      .from('banners').upload(name, f, { cacheControl: '3600', upsert: true })
+    if (upErr) { setError(upErr.message); return null }
+    const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(name)
+    return `${publicUrl}?t=${Date.now()}`
   }
 
   const handleSave = async () => {
     setBusy(true); setError(''); setSaved(false)
-    let url = config?.url_imagem ?? null
 
-    if (bgFile) {
-      const ext = bgFile.name.split('.').pop() ?? 'jpg'
-      await supabase.storage.from('banners').remove([`hero-principal.${ext}`])
-      const { error: upErr } = await supabase.storage
-        .from('banners').upload(`hero-principal.${ext}`, bgFile, { cacheControl: '3600', upsert: true })
-      if (upErr) { setError(upErr.message); setBusy(false); return }
-      const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(`hero-principal.${ext}`)
-      url = `${publicUrl}?t=${Date.now()}`
+    let urlDesktop = config?.url_imagem ?? null
+    if (bgFileDesktop) {
+      const url = await uploadDesktopBg(bgFileDesktop)
+      if (!url) { setBusy(false); return }
+      urlDesktop = url
     }
 
+    let urlMobile: string | null = config?.url_imagem_mobile ?? null
+    if (bgFileMobile) {
+      const url = await uploadMobileBg(bgFileMobile)
+      if (!url) { setBusy(false); return }
+      urlMobile = url
+    } else if (removeBgMobile) {
+      urlMobile = null
+    }
+
+    const mobileEmpty =
+      layersMobile.length === 0 &&
+      overlayMobile.tipo === 'nenhum' &&
+      !urlMobile
+
     const payload = {
-      url_imagem:     url,
-      camadas:        layers,
-      overlay_config: overlay,
-      updated_at:     new Date().toISOString(),
+      url_imagem:            urlDesktop,
+      url_imagem_mobile:     urlMobile,
+      camadas:               layersDesktop,
+      overlay_config:        overlayDesktop,
+      camadas_mobile:        mobileEmpty ? null : layersMobile,
+      overlay_config_mobile: mobileEmpty ? null : overlayMobile,
+      updated_at:            new Date().toISOString(),
     }
 
     let result: HeroConfig | null = null
@@ -298,12 +386,20 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
       result = data as HeroConfig
     }
 
-    setBgFile(null)
+    setBgFileDesktop(null)
+    setBgFileMobile(null)
+    setRemoveBgMobile(false)
     onSaved(result!)
     setSaved(true)
     setBusy(false)
     setTimeout(() => setSaved(false), 3000)
   }
+
+  const mobileEmptyHint =
+    viewport === 'mobile' &&
+    layersMobile.length === 0 &&
+    !bgPreviewMobile &&
+    overlayMobile.tipo === 'nenhum'
 
   return (
     <div className={styles.root}>
@@ -313,6 +409,27 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
           <p className={styles.sub}>Arraste elementos no canvas · clique para selecionar</p>
         </div>
         <div className={styles.headerActions}>
+          {/* Toggle Desktop / Mobile */}
+          <div className={styles.viewportTabs}>
+            <button
+              className={`${styles.viewportTab} ${viewport === 'desktop' ? styles.viewportTabActive : ''}`}
+              onClick={() => setViewport('desktop')}
+            >🖥 Desktop</button>
+            <button
+              className={`${styles.viewportTab} ${viewport === 'mobile' ? styles.viewportTabActive : ''}`}
+              onClick={() => setViewport('mobile')}
+            >📱 Mobile</button>
+          </div>
+          {viewport === 'mobile' && (
+            <button
+              className={styles.btnCopyDesktop}
+              onClick={copyDesktopToMobile}
+              disabled={layersDesktop.length === 0 && overlayDesktop.tipo === 'nenhum'}
+              title="Substitui o layout mobile pelo do desktop"
+            >
+              ⤓ Copiar do desktop
+            </button>
+          )}
           <button className={styles.btnAddText}   onClick={() => addLayer('texto')}>+ Texto</button>
           <button className={styles.btnAddButton} onClick={() => addLayer('botao')}>+ Botão</button>
           <button className={styles.btnSave} onClick={handleSave} disabled={busy}>
@@ -327,7 +444,7 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
         <div className={styles.canvasWrap}>
           <div
             ref={canvasRef}
-            className={styles.canvas}
+            className={`${styles.canvas} ${viewport === 'mobile' ? styles.canvasMobile : ''}`}
             style={{ fontSize: `${scale * 16}px` }}
             onPointerMove={onCanvasPointerMove}
             onPointerUp={onCanvasPointerUp}
@@ -336,7 +453,11 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
             {bgPreview ? (
               <Image src={bgPreview} alt="" fill className={styles.canvasBg} sizes="800px" unoptimized />
             ) : (
-              <div className={styles.canvasBgEmpty}>Sem imagem de fundo</div>
+              <div className={styles.canvasBgEmpty}>
+                {mobileEmptyHint
+                  ? 'Sem versão mobile — o site usará a versão desktop'
+                  : 'Sem imagem de fundo'}
+              </div>
             )}
             <div
               className={styles.canvasOverlay}
@@ -345,7 +466,16 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
             <div className={styles.navGuide} title="Altura aproximada da navegação" />
             {layers.map((layer, idx) => renderLayerOnCanvas(layer, idx))}
           </div>
-          <p className={styles.canvasHint}>Preview proporcional a 1440 px de largura</p>
+          <p className={styles.canvasHint}>
+            {viewport === 'desktop'
+              ? 'Preview proporcional a 1440 px de largura'
+              : 'Preview mobile — proporcional a 390 px de largura'}
+          </p>
+          {viewport === 'mobile' && bgPreviewMobile && (
+            <button type="button" className={styles.btnCopyDesktop} style={{ alignSelf: 'center' }} onClick={clearBgMobile}>
+              Remover imagem mobile
+            </button>
+          )}
         </div>
 
         <div className={styles.panel}>

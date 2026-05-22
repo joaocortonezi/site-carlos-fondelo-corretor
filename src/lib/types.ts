@@ -86,6 +86,10 @@ export interface Banner {
   tipo:            'png' | 'editavel'
   camadas?:        HeroLayer[] | null         // JSONB: array de camadas (apenas editavel)
   overlay_config?: HeroOverlayConfig | null   // JSONB: película sobre a imagem
+  // ── Variantes mobile (viewport < 768px). Null = usa a variante desktop como fallback. ──
+  url_imagem_mobile?:     string | null
+  camadas_mobile?:        HeroLayer[]       | null
+  overlay_config_mobile?: HeroOverlayConfig | null
   created_at:      string
   updated_at:      string
 }
@@ -194,6 +198,10 @@ export interface HeroConfig {
   // ── Editor visual (quando preenchido, substitui o layout legado) ──
   camadas?:        HeroLayer[]       | null
   overlay_config?: HeroOverlayConfig | null
+  // ── Variantes mobile (viewport < 768px). Null = usa a variante desktop como fallback. ──
+  url_imagem_mobile?:     string | null
+  camadas_mobile?:        HeroLayer[]       | null
+  overlay_config_mobile?: HeroOverlayConfig | null
   updated_at:      string
 }
 
