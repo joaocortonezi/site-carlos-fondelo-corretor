@@ -191,3 +191,27 @@
   .title { font-size: clamp(2.8rem, 12vw, 4rem); }
   .actions { flex-direction: column; align-items: flex-start; }
 }
+
+/* ─── Hero compacto no mobile ────────────────────────────────────────────────
+   Em telas < 768px o hero deixa de ocupar 100vh e passa a respeitar a
+   proporção da imagem (16:9, igual ao desktop). Texto e camadas sobrepostas
+   somem — fica só a imagem, alinhada ao topo, com o resto do site começando
+   logo abaixo. (Mockup aprovado pelo cliente em 27/05/2026.) */
+@media (max-width: 768px) {
+  .hero {
+    min-height:    auto;
+    aspect-ratio:  16 / 9;
+    display:       block;
+  }
+  /* Remove o parallax exagerado — o hero é pequeno demais pra justificar */
+  .bgWrap { inset: 0; }
+  /* Esconde conteúdo sobreposto: layout legado, camadas do editor e indicador */
+  .content,
+  .layersContainer,
+  .scrollIndicator { display: none; }
+  /* Setas e dots ficam menores, mais discretas */
+  .arrow { width: 36px; height: 36px; }
+  .arrows { padding: 0 0.75rem; }
+  .dots { bottom: 0.6rem; gap: 0.4rem; }
+  .dot  { width: 7px; height: 7px; }
+}
