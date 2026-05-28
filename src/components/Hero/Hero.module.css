@@ -1,10 +1,11 @@
 .hero {
   position:     relative;
   /* Aspect-ratio fixo + max-height garantem que a imagem nunca seja cortada
-     em nenhuma tela (MacBook 16:10, ultrawide 21:9, etc.). Em 16:9, o hero
-     ocupa praticamente tela inteira. Em outras proporções, fica como uma
-     faixa 16:9 grande no topo, sem corte. (28/05/2026 — pedido do cliente.) */
-  aspect-ratio: 16 / 9;
+     em nenhuma tela (16:9, MacBook 16:10, ultrawide 21:9, etc.). Em 16:10,
+     o hero ocupa praticamente tela inteira em MacBooks (que são nativos
+     16:10) e fica como uma faixa grande no topo nos demais.
+     (28/05/2026 — pedido do cliente: "tentar usar 16:10, ainda está fino".) */
+  aspect-ratio: 16 / 10;
   max-height:   100vh;
   display:      flex;
   align-items:  center;
@@ -21,7 +22,7 @@
 }
 .bgImage {
   /* contain garante zero corte: a imagem inteira sempre aparece,
-     com letterbox quando a proporção não bater com 16:9. */
+     com letterbox quando a proporção não bater com 16:10. */
   object-fit:      contain;
   object-position: center;
 }
@@ -202,7 +203,7 @@
 }
 
 /* ─── Hero mobile ─────────────────────────────────────────────────────────────
-   No mobile, aspect-ratio 16:9 + contain já vem do .hero global.
+   No mobile, aspect-ratio 16:10 + contain já vem do .hero global.
    Aqui só escondemos conteúdo sobreposto (texto/camadas) e ajustamos
    setas/dots pra ficarem mais discretas. */
 @media (max-width: 768px) {

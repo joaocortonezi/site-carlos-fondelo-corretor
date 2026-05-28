@@ -1,6 +1,6 @@
 // ─── Modal do editor visual de Banners Editáveis ─────────────────────────────
-// Editor com canvas 1440×16:9. No site, o banner aparece com a mesma proporção
-// em desktop (cover, ocupa 100vh) e em mobile (contain, 16:9 sem corte).
+// Editor com canvas 1440×16:10. No site, o banner aparece em 16:10 com
+// object-fit: contain (sem corte) em qualquer viewport.
 // Texto/camadas ficam escondidos no mobile (decisão do cliente: 28/05/2026).
 
 'use client'
@@ -264,7 +264,7 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
                 <div className={edStyles.navGuide} title="Altura aproximada da navegação" />
                 {layers.map((layer, idx) => renderLayerOnCanvas(layer, idx))}
               </div>
-              <p className={edStyles.canvasHint}>Preview proporcional a 1440 px · no mobile aparece só a imagem em 16:9</p>
+              <p className={edStyles.canvasHint}>Preview proporcional a 1440 px · no mobile aparece só a imagem em 16:10</p>
             </div>
 
             <div className={edStyles.panel}>

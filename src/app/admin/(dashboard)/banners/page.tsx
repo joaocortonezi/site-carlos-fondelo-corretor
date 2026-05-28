@@ -308,7 +308,7 @@ function BannerPngModal({ banner, supabase, onClose, onSaved, nextOrdem }: PngMo
               <div className={styles.uploadPlaceholder}>
                 <UploadIcon />
                 <p>Clique para selecionar imagem</p>
-                <span>PNG, JPG, WebP · 16:9 (ex: 1920×1080)</span>
+                <span>PNG, JPG, WebP · 16:10 (ex: 1920×1200)</span>
               </div>
             )}
           </div>

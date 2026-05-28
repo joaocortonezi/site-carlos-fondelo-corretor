@@ -1,6 +1,6 @@
 // ─── Editor visual do Slide 0 (hero_config) ───────────────────────────────────
-// Canvas único 1440px / 16:9. No mobile, o site exibe a mesma imagem em 16:9
-// com object-fit: contain (sem corte). Texto/camadas ficam escondidos.
+// Canvas único 1440px / 16:10. No site, o banner aparece em 16:10 com
+// object-fit: contain (sem corte). Texto/camadas ficam escondidos no mobile.
 
 'use client'
 
@@ -302,7 +302,7 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
       <div className={styles.header}>
         <div>
           <h2 className={styles.title}>Editor Visual — Slide 0</h2>
-          <p className={styles.sub}>Arraste elementos no canvas · clique para selecionar · no mobile aparece só a imagem em 16:9</p>
+          <p className={styles.sub}>Arraste elementos no canvas · clique para selecionar · no mobile aparece só a imagem em 16:10</p>
         </div>
         <div className={styles.headerActions}>
           <button className={styles.btnAddText}   onClick={() => addLayer('texto')}>+ Texto</button>

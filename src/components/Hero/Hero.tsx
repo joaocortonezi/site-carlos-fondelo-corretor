@@ -112,7 +112,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   // ── Overlay do slide 0 ────────────────────────────────────────────────────
   // Modo visual: usa overlay_config. Modo legado: usa cor_fundo + opacidade.
   // No mobile o conteúdo sobreposto (camadas + layout legado) é escondido via
-  // CSS — fica só a imagem em 16:9 com contain.
+  // CSS — fica só a imagem em 16:10 com contain.
   const overlayStyle = hasCamadas
     ? overlayCss(heroConfig?.overlay_config)
     : (() => {
