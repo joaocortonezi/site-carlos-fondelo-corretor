@@ -194,17 +194,21 @@
 
 /* ─── Hero compacto no mobile ────────────────────────────────────────────────
    Em telas < 768px o hero deixa de ocupar 100vh e passa a respeitar a
-   proporção da imagem (16:9, igual ao desktop). Texto e camadas sobrepostas
-   somem — fica só a imagem, alinhada ao topo, com o resto do site começando
-   logo abaixo. (Mockup aprovado pelo cliente em 27/05/2026.) */
+   proporção REAL da imagem do slide ativo — não há corte, a imagem
+   inteira aparece. A var --hero-aspect é setada via JS quando a imagem
+   carrega (Hero.tsx onLoadingComplete); fallback 16/9. Texto e camadas
+   sobrepostas somem. (Aprovado pelo cliente em 27/05/2026, ajustado em
+   28/05/2026 para não cortar imagens panorâmicas.) */
 @media (max-width: 768px) {
   .hero {
     min-height:    auto;
-    aspect-ratio:  16 / 9;
+    aspect-ratio:  var(--hero-aspect, 16 / 9);
     display:       block;
   }
   /* Remove o parallax exagerado — o hero é pequeno demais pra justificar */
   .bgWrap { inset: 0; }
+  /* No mobile, mostra a imagem inteira — sem cortar bordas */
+  .bgImage { object-fit: contain !important; }
   /* Esconde conteúdo sobreposto: layout legado, camadas do editor e indicador */
   .content,
   .layersContainer,

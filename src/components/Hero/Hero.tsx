@@ -182,6 +182,10 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   // ── Controle do slideshow ──────────────────────────────────────────────────
   const [current, setCurrent] = useState(0)
   const [resetKey, setResetKey] = useState(0) // bump para reiniciar o timer ao navegar manualmente
+  // Proporções reais (natural width/height) de cada slide. Populadas conforme
+  // as imagens carregam — usadas pra setar --hero-aspect no mobile e evitar corte.
+  const [aspectRatios, setAspectRatios] = useState<Record<number, string>>({})
+  const heroAspect = aspectRatios[current]
   const intervaloMs = (heroConfig?.intervalo ?? 5) * 1000
   const advance = useCallback(() => setCurrent(c => (c + 1) % allSlides.length), [allSlides.length])
   const prev = useCallback(() => { setCurrent(c => (c - 1 + allSlides.length) % allSlides.length); setResetKey(k => k + 1) }, [allSlides.length])
@@ -207,7 +211,11 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   const slide = allSlides[current]
 
   return (
-    <section className={styles.hero} ref={ref}>
+    <section
+      className={styles.hero}
+      ref={ref}
+      style={heroAspect ? ({ ['--hero-aspect' as string]: heroAspect } as React.CSSProperties) : undefined}
+    >
 
       {/* ── Fundos: um div por slide, todos montados, opacity animada ── */}
       {allSlides.map((s, i) => (
@@ -219,7 +227,21 @@ export default function Hero({ banners = [], heroConfig }: Props) {
           transition={{ duration: 0.9, ease: 'easeInOut' }}
         >
           {s.url && (
-            <Image src={s.url} alt="" fill priority={i === 0} className={styles.bgImage} sizes="100vw" />
+            <Image
+              src={s.url}
+              alt=""
+              fill
+              priority={i === 0}
+              className={styles.bgImage}
+              sizes="100vw"
+              onLoadingComplete={img => {
+                if (img.naturalWidth && img.naturalHeight) {
+                  setAspectRatios(prev =>
+                    prev[i] ? prev : { ...prev, [i]: `${img.naturalWidth} / ${img.naturalHeight}` }
+                  )
+                }
+              }}
+            />
           )}
           {/* Overlay de cor/gradiente — cada tipo de slide tem regra diferente */}
           <div
