@@ -16,14 +16,6 @@
   object-fit: cover;
   object-position: center;
 }
-
-/* Variante usada quando o admin subiu uma imagem mobile DEDICADA (vertical).
-   Ela foi pensada pra preencher a tela inteira sem corte, então cover é o
-   comportamento certo em qualquer viewport. */
-.bgImageFill {
-  object-fit: cover;
-  object-position: center;
-}
 .bgOverlay {
   position: absolute;
   inset: 0;
@@ -201,28 +193,22 @@
 }
 
 /* ─── Hero mobile ─────────────────────────────────────────────────────────────
-   Em telas < 768px o hero deixa de ocupar 100vh.
-   - Quando o slide ativo tem imagem mobile DEDICADA (vertical, feita pra
-     preencher) → aspect 9:16 + object-fit: cover (já é o .bgImageFill).
-   - Quando o slide só tem imagem desktop → respeita a proporção REAL da
-     imagem via --hero-aspect (setado via JS no Hero.tsx) + contain
-     (sem corte; imagem inteira aparece, eventualmente com letterbox).
-   Texto e camadas sobrepostas escondidos em qualquer caso.
-   (Aprovado pelo cliente em 27/05/2026; ajustado em 28/05/2026.) */
+   Em telas < 768px o hero deixa de ocupar 100vh e fica fixo em 16:9 — mesma
+   proporção do desktop. A imagem é exibida com object-fit: contain (sem
+   corte; imagem inteira aparece, eventualmente com letterbox lateral se a
+   proporção não for 16:9). Texto e camadas sobrepostas escondidos.
+   (Aprovado pelo cliente em 28/05/2026: "mesma proporção do desktop, sem
+   cortar nada em cima nem abaixo".) */
 @media (max-width: 768px) {
   .hero {
     min-height:    auto;
-    /* Default = proporção da imagem desktop. Quando há mobile dedicada,
-       o JS sobrescreve com a proporção real da imagem mobile (geralmente 9:16). */
-    aspect-ratio:  var(--hero-aspect, 16 / 9);
+    aspect-ratio:  16 / 9;
     display:       block;
   }
   /* Remove o parallax exagerado — o hero é pequeno demais pra justificar */
   .bgWrap { inset: 0; }
-  /* Imagem desktop sendo exibida no mobile → contain (sem corte) */
+  /* Sem corte vertical: contain garante que a imagem inteira aparece */
   .bgImage { object-fit: contain !important; }
-  /* Imagem mobile dedicada → mantém cover (foi feita pra preencher) */
-  .bgImageFill { object-fit: cover !important; }
   /* Esconde conteúdo sobreposto: layout legado, camadas do editor e indicador */
   .content,
   .layersContainer,

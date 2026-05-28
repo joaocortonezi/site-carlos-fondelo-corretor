@@ -16,30 +16,8 @@ import { DEFAULT_FONT }                                        from '@/lib/hero-
 import styles                                                  from './Hero.module.css'
 
 interface Props {
-  banners?:    Pick<Banner,
-    'url_imagem' | 'tipo' | 'camadas' | 'overlay_config' |
-    'url_imagem_mobile' | 'camadas_mobile' | 'overlay_config_mobile'
-  >[]
+  banners?:    Pick<Banner, 'url_imagem' | 'tipo' | 'camadas' | 'overlay_config'>[]
   heroConfig?: HeroConfig | null
-}
-
-// Breakpoint que separa desktop de mobile. Bate com o restante do projeto.
-const MOBILE_BREAKPOINT_PX = 768
-
-/**
- * Detecta se a viewport é mobile (< 768px). Re-renderiza on resize.
- * Antes da hidratação, assume desktop (false) para evitar mismatch SSR.
- */
-function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX - 1}px)`)
-    const onChange = () => setIsMobile(mq.matches)
-    onChange()
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
-  }, [])
-  return isMobile
 }
 
 // Converte cor hex para tupla RGB (necessário para montar rgba() inline)
@@ -120,7 +98,6 @@ function buttonLayerStyle(layer: HeroLayer): React.CSSProperties {
 
 export default function Hero({ banners = [], heroConfig }: Props) {
   const ref = useRef<HTMLElement>(null)
-  const isMobile = useIsMobile()
 
   // scrollYProgress vai de 0 (hero no topo) a 1 (hero saiu da viewport)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
@@ -129,29 +106,15 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   // Conteúdo some antes do fundo — cria separação visual limpa
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
 
-  // ── Resolução de variante mobile/desktop do slide 0 (hero_config) ──
-  // Mobile usa *_mobile se preenchido (banner vertical feito pra preencher tela);
-  // caso contrário cai no desktop, exibido com object-fit: contain (sem corte).
-  const heroCamadas = isMobile && heroConfig?.camadas_mobile && heroConfig.camadas_mobile.length > 0
-    ? heroConfig.camadas_mobile
-    : heroConfig?.camadas
-  const heroOverlayCfg = isMobile && heroConfig?.overlay_config_mobile
-    ? heroConfig.overlay_config_mobile
-    : heroConfig?.overlay_config
-  const heroImg = isMobile && heroConfig?.url_imagem_mobile
-    ? heroConfig.url_imagem_mobile
-    : heroConfig?.url_imagem
-  // Slide 0 tem variante mobile específica subida? → impacta CSS (cover vs contain)
-  const slide0HasMobileVariant = isMobile && !!heroConfig?.url_imagem_mobile
-
-  // true quando o slide 0 tem camadas do editor visual (modo novo)
-  const hasCamadas = !!(heroCamadas && heroCamadas.length > 0)
+  // true quando hero_config tem camadas do editor visual (modo novo)
+  const hasCamadas = !!(heroConfig?.camadas && heroConfig.camadas.length > 0)
 
   // ── Overlay do slide 0 ────────────────────────────────────────────────────
-  // Modo visual: usa overlay_config (variante resolvida acima).
-  // Modo legado: usa cor_fundo + opacidade.
+  // Modo visual: usa overlay_config. Modo legado: usa cor_fundo + opacidade.
+  // No mobile o conteúdo sobreposto (camadas + layout legado) é escondido via
+  // CSS — fica só a imagem em 16:9 com contain.
   const overlayStyle = hasCamadas
-    ? overlayCss(heroOverlayCfg)
+    ? overlayCss(heroConfig?.overlay_config)
     : (() => {
         const hex = heroConfig?.cor_fundo
         if (!hex) return undefined
@@ -174,7 +137,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
     .map((w, i) => ({ word: w, color: rawTitleColors[i], weight: rawTitleWeights[i] }))
     .filter(({ word }) => word.trim() !== '')
   const subtitulo = heroConfig?.subtitulo ?? 'Atendimento personalizado · Compra, venda e locação'
-  const slide0Img = heroImg || '/images/banner.jpg'
+  const slide0Img = heroConfig?.url_imagem || '/images/banner.jpg'
 
   // Helper local para converter hex+alpha em rgba (usado pelos botões legados)
   function hexRgbaOld(hex: string, alpha: number) {
@@ -194,53 +157,31 @@ export default function Hero({ banners = [], heroConfig }: Props) {
 
   // ── Montagem do array de slides ───────────────────────────────────────────
   type Slide = {
-    url:              string
-    branded:          boolean   // true = slide 0 com conteúdo editável
-    tipo:             'hero' | 'png' | 'editavel'
-    camadas?:         HeroLayer[] | null
-    overlay_config?:  HeroOverlayConfig | null
-    hasMobileVariant: boolean   // true = cliente subiu imagem mobile dedicada (vertical) → cover
-  }
-
-  // Resolve a variante (mobile com fallback pra desktop) de um banner.
-  // `hasMobileVariant` é true quando o cliente subiu uma imagem mobile específica
-  // — nesse caso o CSS usa object-fit: cover (a imagem foi feita pra preencher).
-  // Quando false, fica contain (sem corte) pra evitar achatar imagem horizontal.
-  type RawBanner = NonNullable<Props['banners']>[number]
-  const pickBannerVariant = (b: RawBanner) => {
-    const hasMobileImg = isMobile && !!b.url_imagem_mobile
-    const url = hasMobileImg ? b.url_imagem_mobile! : b.url_imagem
-    const camadas = isMobile && b.camadas_mobile && b.camadas_mobile.length > 0
-      ? b.camadas_mobile
-      : b.camadas
-    const overlay = isMobile && b.overlay_config_mobile ? b.overlay_config_mobile : b.overlay_config
-    return { url, camadas, overlay, hasMobileVariant: hasMobileImg }
+    url:           string
+    branded:       boolean   // true = slide 0 com conteúdo editável
+    tipo:          'hero' | 'png' | 'editavel'
+    camadas?:      HeroLayer[] | null
+    overlay_config?: HeroOverlayConfig | null
   }
 
   const allSlides: Slide[] = [
     // Slide 0: sempre o slide principal da hero_config
-    { url: slide0Img, branded: true, tipo: 'hero', hasMobileVariant: slide0HasMobileVariant },
+    { url: slide0Img, branded: true, tipo: 'hero' },
     // Slides 1+: banners ativos do banco (tipo png ou editavel)
     ...banners
-      .map(b => ({ b, v: pickBannerVariant(b) }))
-      .filter(({ b, v }) => (b.tipo === 'png' ? !!v.url : true))
-      .map(({ b, v }) => ({
-        url:               v.url || '',
-        branded:           false,
-        tipo:              b.tipo as 'png' | 'editavel',
-        camadas:           v.camadas,
-        overlay_config:    v.overlay,
-        hasMobileVariant:  v.hasMobileVariant,
+      .filter(b => b.tipo === 'png' ? !!b.url_imagem : true) // PNG sem imagem é ignorado
+      .map(b => ({
+        url:            b.url_imagem || '',
+        branded:        false,
+        tipo:           b.tipo as 'png' | 'editavel',
+        camadas:        b.camadas,
+        overlay_config: b.overlay_config,
       })),
   ]
 
   // ── Controle do slideshow ──────────────────────────────────────────────────
   const [current, setCurrent] = useState(0)
   const [resetKey, setResetKey] = useState(0) // bump para reiniciar o timer ao navegar manualmente
-  // Proporções reais (natural width/height) de cada slide. Populadas conforme
-  // as imagens carregam — usadas pra setar --hero-aspect no mobile e evitar corte.
-  const [aspectRatios, setAspectRatios] = useState<Record<number, string>>({})
-  const heroAspect = aspectRatios[current]
   const intervaloMs = (heroConfig?.intervalo ?? 5) * 1000
   const advance = useCallback(() => setCurrent(c => (c + 1) % allSlides.length), [allSlides.length])
   const prev = useCallback(() => { setCurrent(c => (c - 1 + allSlides.length) % allSlides.length); setResetKey(k => k + 1) }, [allSlides.length])
@@ -266,11 +207,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   const slide = allSlides[current]
 
   return (
-    <section
-      className={styles.hero}
-      ref={ref}
-      style={heroAspect ? ({ ['--hero-aspect' as string]: heroAspect } as React.CSSProperties) : undefined}
-    >
+    <section className={styles.hero} ref={ref}>
 
       {/* ── Fundos: um div por slide, todos montados, opacity animada ── */}
       {allSlides.map((s, i) => (
@@ -282,24 +219,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
           transition={{ duration: 0.9, ease: 'easeInOut' }}
         >
           {s.url && (
-            <Image
-              src={s.url}
-              alt=""
-              fill
-              priority={i === 0}
-              // bgImageFill = imagem mobile vertical, foi feita pra preencher → cover.
-              // bgImage     = imagem desktop sendo exibida em qualquer viewport → contain
-              //               no mobile (sem corte), cover no desktop.
-              className={s.hasMobileVariant ? styles.bgImageFill : styles.bgImage}
-              sizes="100vw"
-              onLoadingComplete={img => {
-                if (img.naturalWidth && img.naturalHeight) {
-                  setAspectRatios(prev =>
-                    prev[i] ? prev : { ...prev, [i]: `${img.naturalWidth} / ${img.naturalHeight}` }
-                  )
-                }
-              }}
-            />
+            <Image src={s.url} alt="" fill priority={i === 0} className={styles.bgImage} sizes="100vw" />
           )}
           {/* Overlay de cor/gradiente — cada tipo de slide tem regra diferente */}
           <div
@@ -327,7 +247,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {heroCamadas!.map((layer, idx) => (
+            {heroConfig!.camadas!.map((layer, idx) => (
               layer.tipo === 'botao' ? (
                 <a key={layer.id} href={layer.href || '#'} style={{ ...buttonLayerStyle(layer), zIndex: idx + 1 }}>
                   {layer.texto}

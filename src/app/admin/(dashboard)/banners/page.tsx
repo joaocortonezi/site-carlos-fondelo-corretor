@@ -238,72 +238,37 @@ interface PngModalProps {
 }
 
 function BannerPngModal({ banner, supabase, onClose, onSaved, nextOrdem }: PngModalProps) {
-  const fileRefDesktop = useRef<HTMLInputElement>(null)
-  const fileRefMobile  = useRef<HTMLInputElement>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   const [titulo,    setTitulo]    = useState(banner?.titulo    ?? '')
   const [subtitulo, setSubtitulo] = useState(banner?.subtitulo ?? '')
   const [ordem,     setOrdem]     = useState(banner?.ordem     ?? nextOrdem)
+  const [preview,   setPreview]   = useState<string | null>(banner?.url_imagem ?? null)
+  const [file,      setFile]      = useState<File | null>(null)
+  const [busy,      setBusy]      = useState(false)
+  const [error,     setError]     = useState('')
 
-  // ── Variante desktop (obrigatória) ──
-  const [previewDesktop, setPreviewDesktop] = useState<string | null>(banner?.url_imagem ?? null)
-  const [fileDesktop,    setFileDesktop]    = useState<File | null>(null)
-
-  // ── Variante mobile (opcional, vertical 9:16). Sem mobile = site usa desktop. ──
-  const [previewMobile, setPreviewMobile] = useState<string | null>(banner?.url_imagem_mobile ?? null)
-  const [fileMobile,    setFileMobile]    = useState<File | null>(null)
-  const [removeMobile,  setRemoveMobile]  = useState(false)
-
-  const [busy,  setBusy]  = useState(false)
-  const [error, setError] = useState('')
-
-  const handleFileDesktop = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
-    setFileDesktop(f); setPreviewDesktop(URL.createObjectURL(f))
-  }
-  const handleFileMobile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]; if (!f) return
-    setFileMobile(f); setPreviewMobile(URL.createObjectURL(f))
-    setRemoveMobile(false)
-  }
-  const clearMobile = () => {
-    setFileMobile(null); setPreviewMobile(null); setRemoveMobile(true)
-    if (fileRefMobile.current) fileRefMobile.current.value = ''
-  }
-
-  // Faz upload de um File no bucket `banners` e devolve a public URL.
-  const uploadFile = async (f: File, prefix: string): Promise<string | null> => {
-    const ext = f.name.split('.').pop() ?? 'png'
-    const fileName = `${prefix}-${Date.now()}.${ext}`
-    const { error: upErr } = await supabase.storage
-      .from('banners').upload(fileName, f, { cacheControl: '3600', upsert: false })
-    if (upErr) { setError(upErr.message); return null }
-    const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(fileName)
-    return publicUrl
+    setFile(f); setPreview(URL.createObjectURL(f))
   }
 
   const handleSave = async () => {
-    if (!previewDesktop && !fileDesktop) { setError('Selecione a imagem desktop.'); return }
+    if (!preview && !file) { setError('Selecione uma imagem.'); return }
     setBusy(true); setError('')
+    let url = banner?.url_imagem ?? ''
 
-    let urlDesktop = banner?.url_imagem ?? ''
-    if (fileDesktop) {
-      const url = await uploadFile(fileDesktop, 'desktop')
-      if (!url) { setBusy(false); return }
-      urlDesktop = url
-    }
-
-    let urlMobile: string | null = banner?.url_imagem_mobile ?? null
-    if (fileMobile) {
-      const url = await uploadFile(fileMobile, 'mobile')
-      if (!url) { setBusy(false); return }
-      urlMobile = url
-    } else if (removeMobile) {
-      urlMobile = null
+    if (file) {
+      const ext = file.name.split('.').pop() ?? 'png'
+      const fileName = `${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('banners').upload(fileName, file, { cacheControl: '3600', upsert: false })
+      if (upErr) { setError(upErr.message); setBusy(false); return }
+      const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(fileName)
+      url = publicUrl
     }
 
     const payload = {
-      url_imagem:        urlDesktop,
-      url_imagem_mobile: urlMobile,
+      url_imagem: url,
       titulo:     titulo || null,
       subtitulo:  subtitulo || null,
       ordem,
@@ -333,55 +298,21 @@ function BannerPngModal({ banner, supabase, onClose, onSaved, nextOrdem }: PngMo
         <div className={styles.modalBody}>
           {error && <p className={styles.error}>{error}</p>}
 
-          <div className={styles.variantsGrid}>
-            {/* Desktop — obrigatório (16:9) */}
-            <div className={styles.variantBlock}>
-              <span className={styles.variantLabel}>Desktop · obrigatório</span>
-              <div className={styles.uploadArea} onClick={() => fileRefDesktop.current?.click()}>
-                {previewDesktop ? (
-                  <div className={styles.previewWrap}>
-                    <Image src={previewDesktop} alt="Preview desktop" fill sizes="500px" className={styles.previewImg} />
-                    <div className={styles.previewHover}>Trocar imagem</div>
-                  </div>
-                ) : (
-                  <div className={styles.uploadPlaceholder}>
-                    <UploadIcon />
-                    <p>Clique para selecionar</p>
-                    <span>PNG, JPG, WebP · 16:9</span>
-                  </div>
-                )}
+          <div className={styles.uploadArea} onClick={() => fileRef.current?.click()}>
+            {preview ? (
+              <div className={styles.previewWrap}>
+                <Image src={preview} alt="Preview" fill sizes="500px" className={styles.previewImg} />
+                <div className={styles.previewHover}>Trocar imagem</div>
               </div>
-              <span className={styles.variantSub}>Aparece em telas ≥ 768px</span>
-            </div>
-
-            {/* Mobile — opcional (9:16 vertical) */}
-            <div className={styles.variantBlock}>
-              <span className={styles.variantLabel}>Mobile · opcional</span>
-              <div className={`${styles.uploadArea} ${styles.uploadAreaMobile}`} onClick={() => fileRefMobile.current?.click()}>
-                {previewMobile ? (
-                  <div className={styles.previewWrap}>
-                    <Image src={previewMobile} alt="Preview mobile" fill sizes="200px" className={styles.previewImg} />
-                    <div className={styles.previewHover}>Trocar imagem</div>
-                  </div>
-                ) : (
-                  <div className={styles.uploadPlaceholder}>
-                    <UploadIcon />
-                    <p>Imagem vertical</p>
-                    <span>9:16 · sem mobile usa o desktop</span>
-                  </div>
-                )}
+            ) : (
+              <div className={styles.uploadPlaceholder}>
+                <UploadIcon />
+                <p>Clique para selecionar imagem</p>
+                <span>PNG, JPG, WebP · 16:9 (ex: 1920×1080)</span>
               </div>
-              {previewMobile && (
-                <button type="button" className={styles.variantRemoveBtn} onClick={clearMobile}>
-                  Remover mobile
-                </button>
-              )}
-              <span className={styles.variantSub}>Aparece em telas &lt; 768px</span>
-            </div>
+            )}
           </div>
-
-          <input ref={fileRefDesktop} type="file" accept="image/*" className={styles.fileInput} onChange={handleFileDesktop} />
-          <input ref={fileRefMobile}  type="file" accept="image/*" className={styles.fileInput} onChange={handleFileMobile} />
+          <input ref={fileRef} type="file" accept="image/*" className={styles.fileInput} onChange={handleFile} />
 
           <div className={styles.fields}>
             <label className={styles.label}>
