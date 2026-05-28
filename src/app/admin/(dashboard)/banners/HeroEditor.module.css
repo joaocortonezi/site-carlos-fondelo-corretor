@@ -88,6 +88,54 @@
   box-shadow:   0 2px 16px rgba(0,0,0,0.2);
 }
 
+/* Canvas mobile: retrato 9:16, limitado em largura pra não tomar a tela inteira */
+.canvasMobile {
+  aspect-ratio: 9 / 16;
+  max-width:    320px;
+  margin:       0 auto;
+}
+
+/* ─── Toggle Desktop / Mobile ─────────────────────────────────────────────── */
+
+.viewportTabs {
+  display:        inline-flex;
+  background:     var(--admin-bg);
+  border:         1px solid var(--admin-border);
+  border-radius:  7px;
+  padding:        2px;
+  gap:            2px;
+}
+.viewportTab {
+  font-size:      0.72rem;
+  font-weight:    600;
+  padding:        0.32rem 0.85rem;
+  border-radius:  5px;
+  border:         none;
+  background:     transparent;
+  color:          var(--admin-text-3);
+  cursor:         pointer;
+  display:        inline-flex;
+  align-items:    center;
+  gap:            0.3rem;
+  transition:     background 0.15s, color 0.15s;
+}
+.viewportTab:hover  { color: var(--admin-text); }
+.viewportTabActive  { background: var(--gold); color: #fff; }
+
+.btnCopyDesktop {
+  font-size:      0.72rem;
+  font-weight:    600;
+  padding:        0.35rem 0.8rem;
+  border-radius:  5px;
+  border:         1px dashed var(--admin-border);
+  background:     none;
+  color:          var(--admin-text-3);
+  cursor:         pointer;
+  transition:     border-color 0.15s, color 0.15s;
+}
+.btnCopyDesktop:hover    { border-color: var(--gold); color: var(--gold); }
+.btnCopyDesktop:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .canvasBg      { object-fit: cover; }
 .canvasBgEmpty {
   position:        absolute; inset: 0;

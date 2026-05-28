@@ -87,6 +87,7 @@ export interface Banner {
   camadas?:        HeroLayer[] | null         // JSONB: array de camadas (apenas editavel)
   overlay_config?: HeroOverlayConfig | null   // JSONB: película sobre a imagem
   // ── Variantes mobile (viewport < 768px). Null = usa a variante desktop como fallback. ──
+  // Banner mobile foi feito pra preencher tela vertical → tipicamente aspect 9:16.
   url_imagem_mobile?:     string | null
   camadas_mobile?:        HeroLayer[]       | null
   overlay_config_mobile?: HeroOverlayConfig | null

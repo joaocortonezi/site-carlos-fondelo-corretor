@@ -1,8 +1,7 @@
 // ─── Modal do editor visual de Banners Editáveis ─────────────────────────────
-// Funciona igual ao HeroEditor mas para banners adicionais (slides 1+).
-// A diferença principal: não tem camadas padrão geradas a partir de config legado.
-// Abre como modal full-screen sobre a página de banners.
-// Compartilha toda a lógica de drag e camadas com HeroEditor via LayerEditorShared.
+// Editor com 2 viewports: desktop (1440px / 16:9) e mobile (390px / 9:16).
+// Cada um tem suas próprias camadas, overlay e imagem de fundo. Mobile é opcional
+// — quando vazio, o site cai no desktop e exibe com object-fit: contain.
 
 'use client'
 
@@ -18,15 +17,16 @@ import {
 import edStyles from './HeroEditor.module.css'
 import styles   from './banners.module.css'
 
-// ─── Defaults ────────────────────────────────────────────────────────────────
-
 function makeEmptyLayers(): HeroLayer[] { return [] }
 function makeEmptyOverlay(): HeroOverlayConfig { return { tipo: 'nenhum' } }
+function cloneLayers(src: HeroLayer[]): HeroLayer[] {
+  return src.map(l => ({ ...l, id: uid() }))
+}
 
-// ─── Component ───────────────────────────────────────────────────────────────
+type Viewport = 'desktop' | 'mobile'
 
 interface Props {
-  banner:   Banner | null   // null = novo banner
+  banner:   Banner | null
   supabase: ReturnType<typeof createBrowserClient>
   onClose:  () => void
   onSaved:  (b: Banner) => void
@@ -37,14 +37,28 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
   const fileRef   = useRef<HTMLInputElement>(null)
   const dragRef   = useRef<{ layerId: string; sx: number; sy: number; lx: number; ly: number } | null>(null)
 
-  const [layers,     setLayers]     = useState<HeroLayer[]>(() =>
+  // ── Variante desktop ──
+  const [layersDesktop,    setLayersDesktop]    = useState<HeroLayer[]>(() =>
     banner?.camadas && banner.camadas.length > 0 ? banner.camadas : makeEmptyLayers()
   )
-  const [overlay,    setOverlay]    = useState<HeroOverlayConfig>(() =>
+  const [overlayDesktop,   setOverlayDesktop]   = useState<HeroOverlayConfig>(() =>
     banner?.overlay_config ?? makeEmptyOverlay()
   )
-  const [bgPreview,  setBgPreview]  = useState<string | null>(banner?.url_imagem ?? null)
-  const [bgFile,     setBgFile]     = useState<File | null>(null)
+  const [bgPreviewDesktop, setBgPreviewDesktop] = useState<string | null>(banner?.url_imagem ?? null)
+  const [bgFileDesktop,    setBgFileDesktop]    = useState<File | null>(null)
+
+  // ── Variante mobile ──
+  const [layersMobile,    setLayersMobile]    = useState<HeroLayer[]>(() =>
+    banner?.camadas_mobile && banner.camadas_mobile.length > 0 ? banner.camadas_mobile : makeEmptyLayers()
+  )
+  const [overlayMobile,   setOverlayMobile]   = useState<HeroOverlayConfig>(() =>
+    banner?.overlay_config_mobile ?? makeEmptyOverlay()
+  )
+  const [bgPreviewMobile, setBgPreviewMobile] = useState<string | null>(banner?.url_imagem_mobile ?? null)
+  const [bgFileMobile,    setBgFileMobile]    = useState<File | null>(null)
+  const [removeBgMobile,  setRemoveBgMobile]  = useState(false)
+
+  const [viewport,   setViewport]   = useState<Viewport>('desktop')
   const [titulo,     setTitulo]     = useState(banner?.titulo    ?? '')
   const [ordem,      setOrdem]      = useState(banner?.ordem     ?? 0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -53,17 +67,28 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
   const [busy,       setBusy]       = useState(false)
   const [error,      setError]      = useState('')
 
+  // Proxies por viewport
+  const layers     = viewport === 'desktop' ? layersDesktop    : layersMobile
+  const overlay    = viewport === 'desktop' ? overlayDesktop   : overlayMobile
+  const bgPreview  = viewport === 'desktop' ? bgPreviewDesktop : bgPreviewMobile
+  const setLayers  = viewport === 'desktop' ? setLayersDesktop : setLayersMobile
+  const setOverlay = viewport === 'desktop' ? setOverlayDesktop : setOverlayMobile
+
+  // Canvas base: 1440 desktop / 390 mobile (iPhone moderno)
+  const canvasBase = viewport === 'desktop' ? 1440 : 390
+  const scale      = canvasW / canvasBase
+
+  useEffect(() => { setSelectedId(null) }, [viewport])
+
   useEffect(() => {
     const obs = new ResizeObserver(es => setCanvasW(es[0].contentRect.width))
     if (canvasRef.current) obs.observe(canvasRef.current)
     return () => obs.disconnect()
-  }, [])
-
-  const scale = canvasW / 1440
+  }, [viewport])
 
   const updateLayer = useCallback((id: string, patch: Partial<HeroLayer>) => {
     setLayers(prev => prev.map(l => l.id === id ? { ...l, ...patch } : l))
-  }, [])
+  }, [setLayers])
 
   const addLayer = (tipo: 'texto' | 'botao') => {
     const base: HeroLayer = tipo === 'texto' ? {
@@ -98,6 +123,15 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
       ;[next[idx], next[idx + dir]] = [next[idx + dir], next[idx]]
       return next
     })
+  }
+
+  // Copia layout completo do desktop pro mobile (substitui o atual).
+  const copyDesktopToMobile = () => {
+    if (layersDesktop.length === 0 && overlayDesktop.tipo === 'nenhum') return
+    if (layersMobile.length > 0 && !confirm('Substituir o layout mobile atual pelo do desktop?')) return
+    setLayersMobile(cloneLayers(layersDesktop))
+    setOverlayMobile(JSON.parse(JSON.stringify(overlayDesktop)) as HeroOverlayConfig)
+    setSelectedId(null)
   }
 
   const onLayerPointerDown = (e: React.PointerEvent, id: string) => {
@@ -170,32 +204,66 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
 
   const handleBgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
-    setBgFile(f); setBgPreview(URL.createObjectURL(f))
+    if (viewport === 'desktop') {
+      setBgFileDesktop(f); setBgPreviewDesktop(URL.createObjectURL(f))
+    } else {
+      setBgFileMobile(f); setBgPreviewMobile(URL.createObjectURL(f))
+      setRemoveBgMobile(false)
+    }
+  }
+
+  const clearBgMobile = () => {
+    setBgFileMobile(null); setBgPreviewMobile(null); setRemoveBgMobile(true)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  const uploadBg = async (f: File, prefix: string): Promise<string | null> => {
+    const ext = f.name.split('.').pop() ?? 'jpg'
+    const name = `${prefix}-${Date.now()}.${ext}`
+    const { error: upErr } = await supabase.storage
+      .from('banners').upload(name, f, { cacheControl: '3600', upsert: false })
+    if (upErr) { setError(upErr.message); return null }
+    const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(name)
+    return publicUrl
   }
 
   const handleSave = async () => {
     setBusy(true); setError('')
-    let url = banner?.url_imagem ?? null
 
-    if (bgFile) {
-      const ext  = bgFile.name.split('.').pop() ?? 'jpg'
-      const name = `banner-editavel-${Date.now()}.${ext}`
-      const { error: upErr } = await supabase.storage
-        .from('banners').upload(name, bgFile, { cacheControl: '3600', upsert: false })
-      if (upErr) { setError(upErr.message); setBusy(false); return }
-      const { data: { publicUrl } } = supabase.storage.from('banners').getPublicUrl(name)
-      url = publicUrl
+    let urlDesktop = banner?.url_imagem ?? null
+    if (bgFileDesktop) {
+      const url = await uploadBg(bgFileDesktop, 'banner-editavel-desktop')
+      if (!url) { setBusy(false); return }
+      urlDesktop = url
     }
 
+    let urlMobile: string | null = banner?.url_imagem_mobile ?? null
+    if (bgFileMobile) {
+      const url = await uploadBg(bgFileMobile, 'banner-editavel-mobile')
+      if (!url) { setBusy(false); return }
+      urlMobile = url
+    } else if (removeBgMobile) {
+      urlMobile = null
+    }
+
+    // Mobile vazio (sem camadas + sem overlay + sem imagem) → grava NULL e cai no fallback
+    const mobileEmpty =
+      layersMobile.length === 0 &&
+      overlayMobile.tipo === 'nenhum' &&
+      !urlMobile
+
     const payload = {
-      titulo:         titulo || null,
-      subtitulo:      null,
-      url_imagem:     url,
+      titulo:                titulo || null,
+      subtitulo:             null,
+      url_imagem:            urlDesktop,
+      url_imagem_mobile:     urlMobile,
       ordem,
-      tipo:           'editavel' as const,
-      camadas:        layers,
-      overlay_config: overlay,
-      updated_at:     new Date().toISOString(),
+      tipo:                  'editavel' as const,
+      camadas:               layersDesktop,
+      overlay_config:        overlayDesktop,
+      camadas_mobile:        mobileEmpty ? null : layersMobile,
+      overlay_config_mobile: mobileEmpty ? null : overlayMobile,
+      updated_at:            new Date().toISOString(),
     }
 
     let result: Banner
@@ -211,9 +279,16 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
       result = data as Banner
     }
 
-    setBgFile(null)
+    setBgFileDesktop(null)
+    setBgFileMobile(null)
     onSaved(result)
   }
+
+  const mobileEmptyHint =
+    viewport === 'mobile' &&
+    layersMobile.length === 0 &&
+    !bgPreviewMobile &&
+    overlayMobile.tipo === 'nenhum'
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -226,6 +301,27 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
             <p className={edStyles.sub}>Arraste elementos no canvas · clique para selecionar</p>
           </div>
           <div className={edStyles.headerActions}>
+            {/* Toggle Desktop / Mobile */}
+            <div className={edStyles.viewportTabs}>
+              <button
+                className={`${edStyles.viewportTab} ${viewport === 'desktop' ? edStyles.viewportTabActive : ''}`}
+                onClick={() => setViewport('desktop')}
+              >🖥 Desktop</button>
+              <button
+                className={`${edStyles.viewportTab} ${viewport === 'mobile' ? edStyles.viewportTabActive : ''}`}
+                onClick={() => setViewport('mobile')}
+              >📱 Mobile</button>
+            </div>
+            {viewport === 'mobile' && (
+              <button
+                className={edStyles.btnCopyDesktop}
+                onClick={copyDesktopToMobile}
+                disabled={layersDesktop.length === 0 && overlayDesktop.tipo === 'nenhum'}
+                title="Substitui o layout mobile pelo do desktop"
+              >
+                ⤓ Copiar do desktop
+              </button>
+            )}
             <button className={edStyles.btnAddText}   onClick={() => addLayer('texto')}>+ Texto</button>
             <button className={edStyles.btnAddButton} onClick={() => addLayer('botao')}>+ Botão</button>
             <button className={edStyles.btnSave} onClick={handleSave} disabled={busy}>
@@ -254,11 +350,10 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
         {/* Editor */}
         <div className={styles.modalEditavelBody}>
           <div className={edStyles.layout} style={{ height: '100%' }}>
-            {/* Canvas */}
             <div className={edStyles.canvasWrap}>
               <div
                 ref={canvasRef}
-                className={edStyles.canvas}
+                className={`${edStyles.canvas} ${viewport === 'mobile' ? edStyles.canvasMobile : ''}`}
                 style={{ fontSize: `${scale * 16}px` }}
                 onPointerMove={onCanvasPointerMove}
                 onPointerUp={onCanvasPointerUp}
@@ -267,16 +362,28 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
                 {bgPreview ? (
                   <Image src={bgPreview} alt="" fill className={edStyles.canvasBg} sizes="800px" unoptimized />
                 ) : (
-                  <div className={edStyles.canvasBgEmpty}>Sem imagem de fundo</div>
+                  <div className={edStyles.canvasBgEmpty}>
+                    {mobileEmptyHint
+                      ? 'Sem versão mobile — o site usará a versão desktop'
+                      : 'Sem imagem de fundo'}
+                  </div>
                 )}
                 <div className={edStyles.canvasOverlay} style={{ background: overlayCssStr(overlay) }} />
                 <div className={edStyles.navGuide} title="Altura aproximada da navegação" />
                 {layers.map((layer, idx) => renderLayerOnCanvas(layer, idx))}
               </div>
-              <p className={edStyles.canvasHint}>Preview proporcional a 1440 px de largura · no mobile aparece só a imagem</p>
+              <p className={edStyles.canvasHint}>
+                {viewport === 'desktop'
+                  ? 'Preview proporcional a 1440 px de largura'
+                  : 'Preview mobile — proporcional a 390 px de largura'}
+              </p>
+              {viewport === 'mobile' && bgPreviewMobile && (
+                <button type="button" className={styles.variantRemoveBtn} style={{ alignSelf: 'center' }} onClick={clearBgMobile}>
+                  Remover imagem mobile
+                </button>
+              )}
             </div>
 
-            {/* Painel */}
             <div className={edStyles.panel}>
               <div className={edStyles.tabs}>
                 <button

@@ -16,6 +16,14 @@
   object-fit: cover;
   object-position: center;
 }
+
+/* Variante usada quando o admin subiu uma imagem mobile DEDICADA (vertical).
+   Ela foi pensada pra preencher a tela inteira sem corte, então cover é o
+   comportamento certo em qualquer viewport. */
+.bgImageFill {
+  object-fit: cover;
+  object-position: center;
+}
 .bgOverlay {
   position: absolute;
   inset: 0;
@@ -192,23 +200,29 @@
   .actions { flex-direction: column; align-items: flex-start; }
 }
 
-/* ─── Hero compacto no mobile ────────────────────────────────────────────────
-   Em telas < 768px o hero deixa de ocupar 100vh e passa a respeitar a
-   proporção REAL da imagem do slide ativo — não há corte, a imagem
-   inteira aparece. A var --hero-aspect é setada via JS quando a imagem
-   carrega (Hero.tsx onLoadingComplete); fallback 16/9. Texto e camadas
-   sobrepostas somem. (Aprovado pelo cliente em 27/05/2026, ajustado em
-   28/05/2026 para não cortar imagens panorâmicas.) */
+/* ─── Hero mobile ─────────────────────────────────────────────────────────────
+   Em telas < 768px o hero deixa de ocupar 100vh.
+   - Quando o slide ativo tem imagem mobile DEDICADA (vertical, feita pra
+     preencher) → aspect 9:16 + object-fit: cover (já é o .bgImageFill).
+   - Quando o slide só tem imagem desktop → respeita a proporção REAL da
+     imagem via --hero-aspect (setado via JS no Hero.tsx) + contain
+     (sem corte; imagem inteira aparece, eventualmente com letterbox).
+   Texto e camadas sobrepostas escondidos em qualquer caso.
+   (Aprovado pelo cliente em 27/05/2026; ajustado em 28/05/2026.) */
 @media (max-width: 768px) {
   .hero {
     min-height:    auto;
+    /* Default = proporção da imagem desktop. Quando há mobile dedicada,
+       o JS sobrescreve com a proporção real da imagem mobile (geralmente 9:16). */
     aspect-ratio:  var(--hero-aspect, 16 / 9);
     display:       block;
   }
   /* Remove o parallax exagerado — o hero é pequeno demais pra justificar */
   .bgWrap { inset: 0; }
-  /* No mobile, mostra a imagem inteira — sem cortar bordas */
+  /* Imagem desktop sendo exibida no mobile → contain (sem corte) */
   .bgImage { object-fit: contain !important; }
+  /* Imagem mobile dedicada → mantém cover (foi feita pra preencher) */
+  .bgImageFill { object-fit: cover !important; }
   /* Esconde conteúdo sobreposto: layout legado, camadas do editor e indicador */
   .content,
   .layersContainer,

@@ -78,7 +78,7 @@ export default async function Home() {
     // Slides do hero (além do slide 0 que vem de hero_config)
     supabase
       .from('banners')
-      .select('url_imagem, tipo, camadas, overlay_config')
+      .select('url_imagem, tipo, camadas, overlay_config, url_imagem_mobile, camadas_mobile, overlay_config_mobile')
       .eq('ativo', true)
       .order('ordem', { ascending: true })
       .limit(10),
