@@ -100,10 +100,10 @@ export default function Hero({ banners = [], heroConfig }: Props) {
   const ref = useRef<HTMLElement>(null)
 
   // scrollYProgress vai de 0 (hero no topo) a 1 (hero saiu da viewport)
+  // Usado só pra fade do conteúdo durante scroll. O parallax vertical foi
+  // removido porque deslocava a imagem mostrando bordas — incompatível com
+  // a regra "zero corte" pedida pelo cliente.
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  // Parallax: fundo sobe mais devagar que o scroll (desloca 25% enquanto scroll vai 100%)
-  const bgY     = useTransform(scrollYProgress, [0, 1], ['0%', '25%'])
-  // Conteúdo some antes do fundo — cria separação visual limpa
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
 
   // true quando hero_config tem camadas do editor visual (modo novo)
@@ -214,8 +214,7 @@ export default function Hero({ banners = [], heroConfig }: Props) {
         <motion.div
           key={`slide-${i}`}
           className={styles.bgWrap}
-          style={{ y: bgY }}                                  // parallax
-          animate={{ opacity: i === current ? 1 : 0 }}       // crossfade
+          animate={{ opacity: i === current ? 1 : 0 }}       // crossfade entre slides
           transition={{ duration: 0.9, ease: 'easeInOut' }}
         >
           {s.url && (

@@ -1,19 +1,28 @@
 .hero {
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
+  position:     relative;
+  /* Aspect-ratio fixo + max-height garantem que a imagem nunca seja cortada
+     em nenhuma tela (MacBook 16:10, ultrawide 21:9, etc.). Em 16:9, o hero
+     ocupa praticamente tela inteira. Em outras proporções, fica como uma
+     faixa 16:9 grande no topo, sem corte. (28/05/2026 — pedido do cliente.) */
+  aspect-ratio: 16 / 9;
+  max-height:   100vh;
+  display:      flex;
+  align-items:  center;
+  overflow:     hidden;
 }
 
 /* Background */
 .bgWrap {
   position: absolute;
-  inset: -10%;
-  z-index: 0;
+  /* inset: 0 (antes era -10% pro parallax, mas isso cortava 10% da imagem
+     em cada lado quando combinado com object-fit: contain). */
+  inset:    0;
+  z-index:  0;
 }
 .bgImage {
-  object-fit: cover;
+  /* contain garante zero corte: a imagem inteira sempre aparece,
+     com letterbox quando a proporção não bater com 16:9. */
+  object-fit:      contain;
   object-position: center;
 }
 .bgOverlay {
@@ -193,22 +202,13 @@
 }
 
 /* ─── Hero mobile ─────────────────────────────────────────────────────────────
-   Em telas < 768px o hero deixa de ocupar 100vh e fica fixo em 16:9 — mesma
-   proporção do desktop. A imagem é exibida com object-fit: contain (sem
-   corte; imagem inteira aparece, eventualmente com letterbox lateral se a
-   proporção não for 16:9). Texto e camadas sobrepostas escondidos.
-   (Aprovado pelo cliente em 28/05/2026: "mesma proporção do desktop, sem
-   cortar nada em cima nem abaixo".) */
+   No mobile, aspect-ratio 16:9 + contain já vem do .hero global.
+   Aqui só escondemos conteúdo sobreposto (texto/camadas) e ajustamos
+   setas/dots pra ficarem mais discretas. */
 @media (max-width: 768px) {
   .hero {
-    min-height:    auto;
-    aspect-ratio:  16 / 9;
-    display:       block;
+    display: block;
   }
-  /* Remove o parallax exagerado — o hero é pequeno demais pra justificar */
-  .bgWrap { inset: 0; }
-  /* Sem corte vertical: contain garante que a imagem inteira aparece */
-  .bgImage { object-fit: contain !important; }
   /* Esconde conteúdo sobreposto: layout legado, camadas do editor e indicador */
   .content,
   .layersContainer,
