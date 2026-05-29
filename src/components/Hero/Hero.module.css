@@ -1,10 +1,15 @@
 .hero {
   position:     relative;
-  /* Desktop: 16:9 + max-height 100vh. Em telas 16:9 puras (Full HD, notebooks)
-     o hero ocupa tela inteira. Em 16:10 (MacBook), fica como uma faixa 16:9
-     grande no topo. Mobile sobrescreve pra 4:5 (mais abaixo). */
-  aspect-ratio: 16 / 9;
-  max-height:   100vh;
+  /* Desktop: largura SEMPRE 100% + altura = 9/16 da largura (16:9), limitada
+     a 100vh. min(56.25vw, 100vh) garante que em ultrawide (>16:9) a altura
+     fica limitada à viewport mas a LARGURA continua cheia — a imagem fica
+     com letterbox lateral (object-fit: contain), mas a tela é coberta. Em
+     16:9 e 16:10 puros, fica natural 16:9 sem letterbox.
+     Mobile sobrescreve pra 4:5 (mais abaixo).
+     (NÃO usar aspect-ratio + max-height — quando max-height ativa, o browser
+     reduz a largura também, causando faixa lateral cinza em ultrawide.) */
+  width:        100%;
+  height:       min(56.25vw, 100vh);
   display:      flex;
   align-items:  center;
   overflow:     hidden;
