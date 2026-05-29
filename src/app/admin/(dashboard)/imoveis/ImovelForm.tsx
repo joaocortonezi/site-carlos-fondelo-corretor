@@ -113,6 +113,8 @@ export default function ImovelForm({ imovel }: Props) {
     situacao:   imovel?.situacao   ?? '',
     preco:      imovel?.preco      != null ? String(imovel.preco)     : '',
     area:       imovel?.area       != null ? String(imovel.area)      : '',
+    area_construida: imovel?.area_construida != null ? String(imovel.area_construida) : '',
+    area_terreno:    imovel?.area_terreno    != null ? String(imovel.area_terreno)    : '',
     quartos:    imovel?.quartos    != null ? String(imovel.quartos)   : '0',
     banheiros:  imovel?.banheiros  != null ? String(imovel.banheiros) : '0',
     vagas:      imovel?.vagas      != null ? String(imovel.vagas)     : '0',
@@ -323,6 +325,8 @@ export default function ImovelForm({ imovel }: Props) {
       situacao:   form.situacao   || null,
       preco:      form.preco      ? Number(form.preco)     : null,
       area:       form.area       ? Number(form.area)      : null,
+      area_construida: form.area_construida ? Number(form.area_construida) : null,
+      area_terreno:    form.area_terreno    ? Number(form.area_terreno)    : null,
       quartos:    Number(form.quartos),
       banheiros:  Number(form.banheiros),
       vagas:      Number(form.vagas),
@@ -484,8 +488,14 @@ export default function ImovelForm({ imovel }: Props) {
           <Field label="Preço (R$)">
             <input type="number" className={styles.input} value={form.preco} onChange={e => set('preco', e.target.value)} placeholder="Ex: 350000" min="0" />
           </Field>
-          <Field label="Área (m²)">
+          <Field label="Área útil (m²)">
             <input type="number" className={styles.input} value={form.area} onChange={e => set('area', e.target.value)} placeholder="Ex: 75" min="0" />
+          </Field>
+          <Field label="Área construída (m²)">
+            <input type="number" className={styles.input} value={form.area_construida} onChange={e => set('area_construida', e.target.value)} placeholder="Ex: 120" min="0" />
+          </Field>
+          <Field label="Área do terreno (m²)">
+            <input type="number" className={styles.input} value={form.area_terreno} onChange={e => set('area_terreno', e.target.value)} placeholder="Ex: 300" min="0" />
           </Field>
           <Field label="Quartos">
             <input type="number" className={styles.input} value={form.quartos} onChange={e => set('quartos', e.target.value)} min="0" />

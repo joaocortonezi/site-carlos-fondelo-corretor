@@ -40,7 +40,13 @@ export default function ImovelCard({ imovel, size = 'default' }: Props) {
         <div className={styles.attrs}>
           {imovel.quartos  > 0 && <span className={styles.attr}><BedIcon />{imovel.quartos} quarto{imovel.quartos > 1 ? 's' : ''}</span>}
           {imovel.banheiros > 0 && <span className={styles.attr}><BathIcon />{imovel.banheiros} banheiro{imovel.banheiros > 1 ? 's' : ''}</span>}
-          {imovel.area      && <span className={styles.attr}><AreaIcon />{formatArea(imovel.area)}</span>}
+          {/* Card mostra apenas UMA área pra não poluir. Prioridade: construída > terreno > legado. */}
+          {(imovel.area_construida || imovel.area_terreno || imovel.area) && (
+            <span className={styles.attr}>
+              <AreaIcon />
+              {formatArea(imovel.area_construida ?? imovel.area_terreno ?? imovel.area!)}
+            </span>
+          )}
           {imovel.vagas    > 0 && <span className={styles.attr}><CarIcon />{imovel.vagas} vaga{imovel.vagas > 1 ? 's' : ''}</span>}
         </div>
       </div>

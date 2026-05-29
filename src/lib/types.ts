@@ -20,7 +20,9 @@ export interface Imovel {
   tipo:        ImovelTipo
   finalidade:  ImovelFinalidade
   preco:       number | null
-  area:        number | null        // m²
+  area:        number | null        // m² — campo legado/geral (compat com imóveis antigos)
+  area_construida: number | null    // m² — área edificada (só estrutura)
+  area_terreno:    number | null    // m² — área do lote (terreno total)
   quartos:     number
   banheiros:   number
   vagas:       number               // vagas de garagem

@@ -94,7 +94,10 @@ export default async function ImovelPage({ params }: PageProps) {
                 <div className={styles.attrs}>
                   {imovel.quartos   > 0 && <AttrItem label="Quartos"   value={String(imovel.quartos)} />}
                   {imovel.banheiros > 0 && <AttrItem label="Banheiros" value={String(imovel.banheiros)} />}
-                  {imovel.area      && <AttrItem label="Área"      value={formatArea(imovel.area)} />}
+                  {imovel.area_construida && <AttrItem label="Área construída" value={formatArea(imovel.area_construida)} />}
+                  {imovel.area_terreno    && <AttrItem label="Área do terreno" value={formatArea(imovel.area_terreno)} />}
+                  {/* Fallback: mostra "Área" geral apenas quando nenhuma específica foi preenchida (compat com imóveis antigos) */}
+                  {imovel.area && !imovel.area_construida && !imovel.area_terreno && <AttrItem label="Área" value={formatArea(imovel.area)} />}
                   {imovel.vagas     > 0 && <AttrItem label="Vagas"     value={String(imovel.vagas)} />}
                 </div>
 

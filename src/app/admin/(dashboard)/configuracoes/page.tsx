@@ -7,6 +7,7 @@ import styles                           from './configuracoes.module.css'
 
 export default function ConfiguracoesPage() {
   const [watermarkUrl, setWatermarkUrl] = useState<string | null>(null)
+  const [pendingFile,  setPendingFile]  = useState<File | null>(null)
   const [preview,      setPreview]      = useState<string | null>(null)
   const [uploading,    setUploading]    = useState(false)
   const [saved,        setSaved]        = useState(false)
@@ -33,36 +34,32 @@ export default function ConfiguracoesPage() {
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const url = URL.createObjectURL(file)
-    setPreview(url)
-    e.target.value = ''
+    setPendingFile(file)
+    setPreview(URL.createObjectURL(file))
+    // não limpa e.target.value aqui — só após salvar, pra não perder a referência
   }
 
   const handleSave = async () => {
-    const file = fileRef.current?.files?.[0]
-    if (!file && !watermarkUrl) return
+    if (!pendingFile && !watermarkUrl) return
     setUploading(true)
     setError('')
     setSaved(false)
 
     let finalUrl = watermarkUrl
 
-    if (file || preview) {
-      const input = document.querySelector<HTMLInputElement>('input[type=file]')
-      const f = input?.files?.[0]
-      if (f) {
-        const path = `watermark/logo.${f.name.split('.').pop()}`
-        const { data, error: upErr } = await supabase.storage
-          .from('imoveis')
-          .upload(path, f, { upsert: true, contentType: f.type })
-        if (upErr || !data) {
-          setError('Erro ao fazer upload da imagem.')
-          setUploading(false)
-          return
-        }
-        const { data: { publicUrl } } = supabase.storage.from('imoveis').getPublicUrl(data.path)
-        finalUrl = publicUrl
+    if (pendingFile) {
+      const path = `watermark/logo.${pendingFile.name.split('.').pop()}`
+      const { data, error: upErr } = await supabase.storage
+        .from('imoveis')
+        .upload(path, pendingFile, { upsert: true, contentType: pendingFile.type })
+      if (upErr || !data) {
+        setError('Erro ao fazer upload da imagem.')
+        setUploading(false)
+        return
       }
+      const { data: { publicUrl } } = supabase.storage.from('imoveis').getPublicUrl(data.path)
+      // cache-bust pra garantir que browsers e CDN peguem a nova versão
+      finalUrl = `${publicUrl}?t=${Date.now()}`
     }
 
     const { error: dbErr } = await supabase
@@ -73,7 +70,9 @@ export default function ConfiguracoesPage() {
       setError('Erro ao salvar configuração.')
     } else {
       setWatermarkUrl(finalUrl)
+      setPendingFile(null)
       setPreview(null)
+      if (fileRef.current) fileRef.current.value = ''
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     }
@@ -82,9 +81,13 @@ export default function ConfiguracoesPage() {
 
   const handleRemove = async () => {
     if (!confirm('Remover marca d\'água? As novas fotos não terão marca d\'água.')) return
-    await supabase.from('configuracoes').upsert({ chave: 'watermark_url', valor: null })
+    await supabase
+      .from('configuracoes')
+      .upsert({ chave: 'watermark_url', valor: null, updated_at: new Date().toISOString() })
     setWatermarkUrl(null)
+    setPendingFile(null)
     setPreview(null)
+    if (fileRef.current) fileRef.current.value = ''
   }
 
   const current = preview ?? watermarkUrl
@@ -146,7 +149,7 @@ export default function ConfiguracoesPage() {
         <button
           className={styles.btnSave}
           onClick={handleSave}
-          disabled={uploading || (!preview && !!watermarkUrl && !preview)}
+          disabled={uploading || !pendingFile}
         >
           {uploading ? 'Salvando…' : 'Salvar configurações'}
         </button>
