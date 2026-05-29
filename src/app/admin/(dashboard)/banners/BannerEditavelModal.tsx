@@ -1,7 +1,6 @@
 // ─── Modal do editor visual de Banners Editáveis ─────────────────────────────
-// Editor com 2 viewports: desktop e mobile. Ambos em canvas 16:10 (mesma
-// proporção que aparece no site). A diferença é só semântica — o cliente
-// pode subir composições diferentes pra cada viewport. Mobile é opcional;
+// Editor com 2 viewports: desktop (canvas 16:9) e mobile (canvas 4:5).
+// Cada um tem suas próprias camadas, overlay e imagem. Mobile é opcional;
 // quando vazio, o site cai no desktop.
 
 'use client'
@@ -372,8 +371,8 @@ export default function BannerEditavelModal({ banner, supabase, onClose, onSaved
               </div>
               <p className={edStyles.canvasHint}>
                 {viewport === 'desktop'
-                  ? 'Preview proporcional a 1440 px · 16:10'
-                  : 'Preview mobile · 16:10'}
+                  ? 'Preview proporcional a 1440 px · 16:9 (ex 1920×1080)'
+                  : 'Preview mobile · 4:5 (ex 1080×1350)'}
               </p>
               {viewport === 'mobile' && bgPreviewMobile && (
                 <button type="button" className={styles.variantRemoveBtn} style={{ alignSelf: 'center' }} onClick={clearBgMobile}>

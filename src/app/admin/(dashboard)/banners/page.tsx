@@ -348,7 +348,7 @@ function BannerPngModal({ banner, supabase, onClose, onSaved, nextOrdem }: PngMo
                   <div className={styles.uploadPlaceholder}>
                     <UploadIcon />
                     <p>Clique para selecionar</p>
-                    <span>PNG, JPG, WebP · 16:10 (ex: 1920×1200)</span>
+                    <span>PNG, JPG, WebP · 16:9 (ex: 1920×1080)</span>
                   </div>
                 )}
               </div>
@@ -368,7 +368,7 @@ function BannerPngModal({ banner, supabase, onClose, onSaved, nextOrdem }: PngMo
                   <div className={styles.uploadPlaceholder}>
                     <UploadIcon />
                     <p>Versão mobile</p>
-                    <span>16:10 · sem mobile usa o desktop</span>
+                    <span>4:5 (ex: 1080×1350) · sem mobile usa o desktop</span>
                   </div>
                 )}
               </div>

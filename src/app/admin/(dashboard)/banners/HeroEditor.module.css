@@ -80,7 +80,7 @@
 .canvas {
   position:     relative;
   width:        100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   overflow:     hidden;
   border-radius: 8px;
   background:   #111;
@@ -88,12 +88,12 @@
   box-shadow:   0 2px 16px rgba(0,0,0,0.2);
 }
 
-/* Canvas mobile: mesma proporção 16:10, mas largura limitada pra dar dica
-   visual de "isso é mobile". Não simula tamanho real do celular — só ajuda
-   o autor a saber que está editando a versão mobile. */
+/* Canvas mobile: 4:5 vertical (igual ao banner no site mobile), largura
+   limitada pra ficar compacto no editor. */
 .canvasMobile {
-  max-width: 480px;
-  margin:    0 auto;
+  aspect-ratio: 4 / 5;
+  max-width:    360px;
+  margin:       0 auto;
 }
 
 /* ─── Toggle Desktop / Mobile ─────────────────────────────────────────────── */

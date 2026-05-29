@@ -469,9 +469,9 @@
 }
 .uploadArea:hover { border-color: var(--gold); }
 
-/* Preview da variante mobile — mesma proporção 16:10 do desktop, só menor
-   pra dar dica visual de que é a versão pra celular. */
-.uploadAreaMobile { aspect-ratio: 16/10; }
+/* Preview da variante mobile — 4:5 vertical (mesma proporção que aparece
+   no site mobile). */
+.uploadAreaMobile { aspect-ratio: 4/5; }
 
 /* Variantes desktop + mobile lado a lado no modal PNG */
 .variantsGrid {

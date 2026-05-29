@@ -1,5 +1,5 @@
 // ─── Editor visual do Slide 0 (hero_config) ───────────────────────────────────
-// Editor com 2 viewports: desktop (canvas 1440px / 16:10) e mobile (480px / 16:10).
+// Editor com 2 viewports: desktop (canvas 1440px / 16:9) e mobile (480px / 4:5).
 // Ambos no site usam object-fit: contain (sem corte). Defaults legados só
 // populam o desktop; mobile começa vazio.
 
@@ -453,8 +453,8 @@ export default function HeroEditor({ config, supabase, onSaved }: Props) {
           </div>
           <p className={styles.canvasHint}>
             {viewport === 'desktop'
-              ? 'Preview proporcional a 1440 px · 16:10'
-              : 'Preview mobile · 16:10'}
+              ? 'Preview proporcional a 1440 px · 16:9 (ex 1920×1080)'
+              : 'Preview mobile · 4:5 (ex 1080×1350)'}
           </p>
           {viewport === 'mobile' && bgPreviewMobile && (
             <button type="button" className={styles.btnCopyDesktop} style={{ alignSelf: 'center' }} onClick={clearBgMobile}>
