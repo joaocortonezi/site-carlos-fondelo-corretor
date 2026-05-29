@@ -1,15 +1,13 @@
 .hero {
   position:     relative;
-  /* Desktop: largura SEMPRE 100% + altura = 9/16 da largura (16:9), limitada
-     a 100vh. min(56.25vw, 100vh) garante que em ultrawide (>16:9) a altura
-     fica limitada à viewport mas a LARGURA continua cheia — a imagem fica
-     com letterbox lateral (object-fit: contain), mas a tela é coberta. Em
-     16:9 e 16:10 puros, fica natural 16:9 sem letterbox.
-     Mobile sobrescreve pra 4:5 (mais abaixo).
-     (NÃO usar aspect-ratio + max-height — quando max-height ativa, o browser
-     reduz a largura também, causando faixa lateral cinza em ultrawide.) */
+  /* Desktop: fullscreen sempre (100vh + 100vw via flex). A imagem usa
+     object-fit: cover (em .bgImage) — em 16:9 puro preenche perfeito sem
+     corte; em MacBook 16:10 corta ~5% das laterais; em ultrawide corta um
+     pouco do topo/base. Trade-off aceito pelo cliente em 29/05/2026 pra
+     manter visual cinematográfico sem espaço vazio embaixo.
+     Mobile sobrescreve pra 4:5 + contain (sem corte no celular). */
+  min-height:   100vh;
   width:        100%;
-  height:       min(56.25vw, 100vh);
   display:      flex;
   align-items:  center;
   overflow:     hidden;
@@ -24,9 +22,10 @@
   z-index:  0;
 }
 .bgImage {
-  /* contain garante zero corte: a imagem inteira sempre aparece,
-     com letterbox quando a proporção da imagem não bater com a do hero. */
-  object-fit:      contain;
+  /* Desktop: cover preenche tela toda. Em 16:9 puro não corta;
+     em MacBook 16:10 / ultrawide corta ~5% sobrando para o eixo "errado".
+     Mobile sobrescreve com contain (zero corte no celular). */
+  object-fit:      cover;
   object-position: center;
 }
 .bgOverlay {
@@ -214,10 +213,14 @@
    inteira.) */
 @media (max-width: 768px) {
   .hero {
+    /* desfaz o min-height: 100vh do desktop pra o aspect-ratio ditar */
+    min-height:   auto;
     aspect-ratio: 4 / 5;
     max-height:   70vh;
     display:      block;
   }
+  /* No mobile força contain — sem corte, mantém promessa do mockup do cliente */
+  .bgImage { object-fit: contain !important; }
   /* Esconde conteúdo sobreposto: layout legado, camadas do editor e indicador */
   .content,
   .layersContainer,
