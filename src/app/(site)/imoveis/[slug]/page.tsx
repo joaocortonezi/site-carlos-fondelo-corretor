@@ -3,6 +3,7 @@ import Nav                      from '@/components/Nav/Nav'
 import FotoGaleria              from '@/components/FotoGaleria/FotoGaleria'
 import LeadForm                 from '@/components/LeadForm/LeadForm'
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { getWatermarkUrl }      from '@/lib/watermark'
 import { formatPrice, formatArea } from '@/lib/utils'
 import { PerfilCorretor }       from '@/lib/types'
 import styles                   from './imovel.module.css'
@@ -17,7 +18,7 @@ async function findImovel(slug: string) {
   const column   = UUID_REGEX.test(slug) ? 'id' : 'slug'
   const { data } = await supabase
     .from('imoveis')
-    .select('*, fotos:fotos_imoveis(id, url, ordem)')
+    .select('*, fotos:fotos_imoveis(id, url, ordem, watermark_url_aplicada)')
     .eq(column, slug)
     .eq('status', 'disponivel')
     .maybeSingle()
@@ -41,11 +42,10 @@ export default async function ImovelPage({ params }: PageProps) {
   if (!imovel) notFound()
 
   const supabase = await createSupabaseServer()
-  const { data: perfilData } = await supabase
-    .from('perfil_corretor')
-    .select('*')
-    .limit(1)
-    .maybeSingle()
+  const [{ data: perfilData }, watermarkUrl] = await Promise.all([
+    supabase.from('perfil_corretor').select('*').limit(1).maybeSingle(),
+    getWatermarkUrl(),
+  ])
   const perfil = perfilData as PerfilCorretor | null
 
   const fotos  = (imovel.fotos ?? []).sort((a: {ordem:number}, b: {ordem:number}) => a.ordem - b.ordem)
@@ -71,6 +71,7 @@ export default async function ImovelPage({ params }: PageProps) {
                 titulo={imovel.titulo}
                 videoHorizontal={imovel.video_horizontal}
                 videoVertical={imovel.video_vertical}
+                watermarkUrl={watermarkUrl}
               />
 
               <div className={styles.infoBlock}>

@@ -1,16 +1,18 @@
 import Link       from 'next/link'
-import Image      from 'next/image'
 import { Imovel } from '@/lib/types'
+import WatermarkedImage from '@/components/WatermarkedImage/WatermarkedImage'
 import { formatPrice, formatArea } from '@/lib/utils'
 import styles     from './ImovelCard.module.css'
 
 interface Props {
-  imovel: Imovel
-  size?:  'default' | 'featured' | 'small'
+  imovel:        Imovel
+  size?:         'default' | 'featured' | 'small'
+  watermarkUrl?: string | null
 }
 
-export default function ImovelCard({ imovel, size = 'default' }: Props) {
-  const foto = imovel.fotos?.sort((a, b) => a.ordem - b.ordem)[0]?.url
+export default function ImovelCard({ imovel, size = 'default', watermarkUrl }: Props) {
+  const fotoCapa = imovel.fotos?.sort((a, b) => a.ordem - b.ordem)[0]
+  const foto = fotoCapa?.url
   // `||` em vez de `??`: slug pode ser string vazia em imóveis legados
   const href = `/imoveis/${imovel.slug || imovel.id}`
 
@@ -18,7 +20,15 @@ export default function ImovelCard({ imovel, size = 'default' }: Props) {
     <Link href={href} className={`${styles.card} ${styles[size]}`}>
       <div className={styles.imgWrap}>
         {foto ? (
-          <Image src={foto} alt={imovel.titulo} fill className={styles.img} sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" />
+          <WatermarkedImage
+            src={foto}
+            alt={imovel.titulo}
+            fill
+            className={styles.img}
+            sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw"
+            watermarkUrl={watermarkUrl}
+            bakedWatermark={!!fotoCapa?.watermark_url_aplicada}
+          />
         ) : (
           <div className={styles.placeholder} />
         )}

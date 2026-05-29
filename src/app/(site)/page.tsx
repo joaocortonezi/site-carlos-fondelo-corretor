@@ -15,6 +15,7 @@ import CinemaSection         from '@/components/CinemaSection/CinemaSection'
 import CaptacaoSection       from '@/components/CaptacaoSection/CaptacaoSection'
 import NewsletterSection     from '@/components/NewsletterSection/NewsletterSection'
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { getWatermarkUrl }      from '@/lib/watermark'
 import { PerfilCorretor, CaptacaoConfig } from '@/lib/types'
 
 export default async function Home() {
@@ -36,7 +37,7 @@ export default async function Home() {
     // Imóveis exclusivos para a seção ExclusiveProperties
     supabase
       .from('imoveis')
-      .select('*, fotos:fotos_imoveis(id, url, ordem)')
+      .select('*, fotos:fotos_imoveis(id, url, ordem, watermark_url_aplicada)')
       .eq('status', 'disponivel')
       .eq('exclusivo', true)
       .order('created_at', { ascending: false })
@@ -45,7 +46,7 @@ export default async function Home() {
     // Imóveis de alto padrão (flag ou preço >= R$ 900k)
     supabase
       .from('imoveis')
-      .select('*, fotos:fotos_imoveis(id, url, ordem)')
+      .select('*, fotos:fotos_imoveis(id, url, ordem, watermark_url_aplicada)')
       .eq('status', 'disponivel')
       .or('alto_padrao.eq.true,preco.gte.900000')
       .order('preco', { ascending: false })
@@ -100,7 +101,7 @@ export default async function Home() {
     // Imóveis em destaque para a seção Destaques
     supabase
       .from('imoveis')
-      .select('*, fotos:fotos_imoveis(id, url, ordem)')
+      .select('*, fotos:fotos_imoveis(id, url, ordem, watermark_url_aplicada)')
       .eq('status', 'disponivel')
       .order('destaque',   { ascending: false })
       .order('created_at', { ascending: false })
@@ -119,17 +120,20 @@ export default async function Home() {
     (bairrosData ?? []).map(i => i.bairro).filter(Boolean) as string[]
   )].sort()
 
+  // URL da marca d'água (null = não aplica overlay nos cards/galerias)
+  const watermarkUrl = await getWatermarkUrl()
+
   return (
     <>
       <Nav />
       {/* Hero: slide 0 (hero_config) + slides adicionais (banners) */}
       <Hero banners={bannersAtivos ?? []} heroConfig={heroConfigData} />
       <Search bairros={bairros} />
-      <Destaques imoveis={destaquesData ?? []} />
+      <Destaques imoveis={destaquesData ?? []} watermarkUrl={watermarkUrl} />
       <Videos imoveis={imoveisComVideo ?? []} />
-      <ExclusiveProperties imoveis={exclusivos ?? []} />
+      <ExclusiveProperties imoveis={exclusivos ?? []} watermarkUrl={watermarkUrl} />
       <Reviews avaliacoes={avaliacoesData ?? []} />
-      <HighEnd imoveis={altopadrao ?? []} />
+      <HighEnd imoveis={altopadrao ?? []} watermarkUrl={watermarkUrl} />
       {/* Seção cinemascope (2.35:1) — só renderiza se foto_cinemascope_url estiver preenchida */}
       <CinemaSection imageUrl={(perfilData as PerfilCorretor | null)?.foto_cinemascope_url} />
       <CaptacaoSection config={captacaoConfigData as CaptacaoConfig | null} />

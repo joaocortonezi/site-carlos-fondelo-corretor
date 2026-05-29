@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image        from 'next/image'
 import { FotoImovel } from '@/lib/types'
+import WatermarkedImage from '@/components/WatermarkedImage/WatermarkedImage'
 import styles       from './FotoGaleria.module.css'
 
 interface Props {
@@ -10,9 +11,10 @@ interface Props {
   titulo:          string
   videoHorizontal?: string | null
   videoVertical?:   string | null
+  watermarkUrl?:   string | null
 }
 
-export default function FotoGaleria({ fotos, titulo, videoHorizontal, videoVertical }: Props) {
+export default function FotoGaleria({ fotos, titulo, videoHorizontal, videoVertical, watermarkUrl }: Props) {
   const [current,   setCurrent]   = useState(0)
   const [videoOpen, setVideoOpen] = useState(false)
 
@@ -45,13 +47,16 @@ export default function FotoGaleria({ fotos, titulo, videoHorizontal, videoVerti
       ) : (
         <>
           <div className={styles.main}>
-            <Image
+            <WatermarkedImage
               src={fotos[current].url}
               alt={`${titulo} — foto ${current + 1}`}
               fill
               className={styles.mainImg}
               sizes="(max-width:768px) 100vw, 60vw"
               priority={current === 0}
+              watermarkUrl={watermarkUrl}
+              // Foto antiga já tem watermark queimada nos pixels → não duplica overlay
+              bakedWatermark={!!fotos[current].watermark_url_aplicada}
             />
             {fotos.length > 1 && (
               <>

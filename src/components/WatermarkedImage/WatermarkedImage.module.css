@@ -1,0 +1,25 @@
+/* Container relativo pra ancorar o overlay. Herda o tamanho do filho. */
+.wrap {
+  position: relative;
+  display:  block;
+  width:    100%;
+  height:   100%;
+}
+
+/* Overlay no canto inferior direito — mesma posição/tamanho que tínhamos quando
+   queimávamos via canvas (28% da largura, 2% de margem, 72% opacidade).
+   pointer-events: none pra não interferir com hover/click da imagem. */
+.watermark {
+  position:       absolute;
+  bottom:         2%;
+  right:          2%;
+  width:          28%;
+  height:         auto;
+  max-height:     28%;
+  object-fit:     contain;
+  opacity:        0.72;
+  pointer-events: none;
+  user-select:    none;
+  /* Sombra suave pra destacar a logo sobre imagens claras */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+}

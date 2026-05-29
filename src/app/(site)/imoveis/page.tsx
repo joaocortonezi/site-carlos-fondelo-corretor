@@ -3,6 +3,7 @@ import Nav                      from '@/components/Nav/Nav'
 import ImovelCard               from '@/components/ImovelCard/ImovelCard'
 import ImovelFiltros            from './ImovelFiltros'
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { getWatermarkUrl }      from '@/lib/watermark'
 import styles                   from './imoveis.module.css'
 
 interface PageProps {
@@ -30,7 +31,7 @@ export default async function ImoveisPage({ searchParams }: PageProps) {
 
   let query = supabase
     .from('imoveis')
-    .select('*, fotos:fotos_imoveis(id, url, ordem)')
+    .select('*, fotos:fotos_imoveis(id, url, ordem, watermark_url_aplicada)')
     .eq('status', 'disponivel')
     .order('destaque',   { ascending: false })
     .order('created_at', { ascending: false })
@@ -61,13 +62,14 @@ export default async function ImoveisPage({ searchParams }: PageProps) {
   if (params.exclusivo   === 'true') query = query.eq('exclusivo', true)
   if (params.alto_padrao === 'true') query = query.eq('alto_padrao', true)
 
-  const [{ data: imoveis }, { data: bairrosData }] = await Promise.all([
+  const [{ data: imoveis }, { data: bairrosData }, watermarkUrl] = await Promise.all([
     query,
     supabase
       .from('imoveis')
       .select('bairro')
       .eq('status', 'disponivel')
       .not('bairro', 'is', null),
+    getWatermarkUrl(),
   ])
 
   const bairros = [...new Set(
@@ -101,7 +103,7 @@ export default async function ImoveisPage({ searchParams }: PageProps) {
           {imoveis && imoveis.length > 0 ? (
             <div className={styles.grid}>
               {imoveis.map(imovel => (
-                <ImovelCard key={imovel.id} imovel={imovel} />
+                <ImovelCard key={imovel.id} imovel={imovel} watermarkUrl={watermarkUrl} />
               ))}
             </div>
           ) : (

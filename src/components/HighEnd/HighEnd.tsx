@@ -11,9 +11,9 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 }
 
-interface Props { imoveis: Imovel[] }
+interface Props { imoveis: Imovel[]; watermarkUrl?: string | null }
 
-export default function HighEnd({ imoveis }: Props) {
+export default function HighEnd({ imoveis, watermarkUrl }: Props) {
   if (!imoveis.length) return null
 
   const [featured, ...rest] = imoveis
@@ -45,7 +45,7 @@ export default function HighEnd({ imoveis }: Props) {
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            <ImovelCard imovel={featured} size="featured" />
+            <ImovelCard imovel={featured} size="featured" watermarkUrl={watermarkUrl} />
           </motion.div>
 
           {rest.length > 0 && (
@@ -59,7 +59,7 @@ export default function HighEnd({ imoveis }: Props) {
                   viewport={{ once: true, margin: '-40px' }}
                   transition={{ delay: 0.1 + i * 0.1 } as never}
                 >
-                  <ImovelCard imovel={imovel} size="small" />
+                  <ImovelCard imovel={imovel} size="small" watermarkUrl={watermarkUrl} />
                 </motion.div>
               ))}
             </div>

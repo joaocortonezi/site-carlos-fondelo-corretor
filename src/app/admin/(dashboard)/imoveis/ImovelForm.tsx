@@ -30,23 +30,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
-async function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new window.Image()
-    img.crossOrigin = 'anonymous'
-    img.onload  = () => resolve(img)
-    img.onerror = reject
-    img.src = src
-  })
-}
-
-async function compressImage(file: File, watermarkUrl?: string | null): Promise<File> {
+/**
+ * Comprime e converte imagem pra WebP (max 1920px no maior lado, qualidade 0.82).
+ * NÃO aplica marca d'água — a watermark é renderizada como overlay CSS no site,
+ * preservando a imagem original e permitindo ligar/desligar sem reprocessar.
+ */
+async function compressImage(file: File): Promise<File> {
   const MAX_PX  = 1920
   const QUALITY = 0.82
   return new Promise((resolve) => {
     const img    = new window.Image()
     const objUrl = URL.createObjectURL(file)
-    img.onload = async () => {
+    img.onload = () => {
       URL.revokeObjectURL(objUrl)
       const { naturalWidth: w, naturalHeight: h } = img
       const needsResize = w > MAX_PX || h > MAX_PX
@@ -56,21 +51,6 @@ async function compressImage(file: File, watermarkUrl?: string | null): Promise<
       canvas.height = Math.round(h * ratio)
       const ctx = canvas.getContext('2d')!
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-
-      if (watermarkUrl) {
-        try {
-          const wm      = await loadImage(watermarkUrl)
-          const wmW     = Math.round(canvas.width  * 0.28)
-          const wmH     = Math.round((wm.naturalHeight / wm.naturalWidth) * wmW)
-          const margin  = Math.round(canvas.width * 0.02)
-          const x       = canvas.width  - wmW - margin
-          const y       = canvas.height - wmH - margin
-          ctx.globalAlpha = 0.72
-          ctx.drawImage(wm, x, y, wmW, wmH)
-          ctx.globalAlpha = 1
-        } catch { /* marca d'água falhou — continua sem ela */ }
-      }
-
       canvas.toBlob(
         (blob) => {
           if (!blob) { resolve(file); return }
@@ -149,7 +129,6 @@ export default function ImovelForm({ imovel }: Props) {
     if (previewVideoH) URL.revokeObjectURL(previewVideoH)
   }, [previewVideoV, previewVideoH])
 
-  const [watermarkUrl,  setWatermarkUrl]  = useState<string | null>(null)
   const [uploading,     setUploading]     = useState(false)
   const [uploadStatus,  setUploadStatus]  = useState('')
   const [uploadStep,    setUploadStep]    = useState(0)
@@ -161,16 +140,6 @@ export default function ImovelForm({ imovel }: Props) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
-
-  useEffect(() => {
-    supabase
-      .from('configuracoes')
-      .select('valor')
-      .eq('chave', 'watermark_url')
-      .single()
-      .then(({ data }) => { if (data?.valor) setWatermarkUrl(data.valor) })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     if (isEdit) return
@@ -272,12 +241,17 @@ export default function ImovelForm({ imovel }: Props) {
     return { url: data.secure_url }
   }
 
+  /**
+   * Upload de fotos novas. SEMPRE sobe a imagem LIMPA (sem watermark queimada).
+   * A marca d'água é aplicada como overlay CSS no site — preserva o original
+   * e permite ligar/desligar/trocar a watermark sem reprocessar nada.
+   */
   const uploadFotos = async (imovelId: string): Promise<string[]> => {
     const urls: string[] = []
     for (let i = 0; i < newFiles.length; i++) {
       setUploadStatus(`Comprimindo e enviando foto ${i + 1} de ${newFiles.length}…`)
       setUploadStep(i + 1)
-      const compressed = await compressImage(newFiles[i], watermarkUrl)
+      const compressed = await compressImage(newFiles[i])
       const path = `${imovelId}/${Date.now()}-${i}.webp`
       const { data } = await supabase.storage
         .from('imoveis')
@@ -388,18 +362,17 @@ export default function ImovelForm({ imovel }: Props) {
       await supabase.from('imoveis').update(videoUpdate).eq('id', imovelId!)
     }
 
-    // Upload fotos (comprimidas)
+    // Upload fotos (limpas, sem watermark queimada — overlay aplicado via CSS)
     if (newFiles.length > 0) {
       setUploadTotal(newFiles.length)
       const urls = await uploadFotos(imovelId!)
       const ordemBase = existingFotos.length
-      // Registra qual marca d'água foi aplicada (ou null) — usado pelo botão
-      // "Aplicar nas existentes" pra detectar fotos que precisam reprocessar.
       const fotoRows = urls.map((url, i) => ({
         imovel_id: imovelId!,
         url,
         ordem: ordemBase + i,
-        watermark_url_aplicada: watermarkUrl ?? null,
+        // Foto subida sem watermark queimada → null. Permite overlay funcionar.
+        watermark_url_aplicada: null,
       }))
       await supabase.from('fotos_imoveis').insert(fotoRows)
     }
