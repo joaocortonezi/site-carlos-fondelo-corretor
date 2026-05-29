@@ -49,6 +49,7 @@ export interface FotoImovel {
   imovel_id:  string
   url:        string
   ordem:      number    // posição na galeria (0 = capa)
+  watermark_url_aplicada: string | null  // URL da marca d'água gravada nesta foto; NULL = sem watermark
   created_at: string
 }
 

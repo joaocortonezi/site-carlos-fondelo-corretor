@@ -393,10 +393,13 @@ export default function ImovelForm({ imovel }: Props) {
       setUploadTotal(newFiles.length)
       const urls = await uploadFotos(imovelId!)
       const ordemBase = existingFotos.length
+      // Registra qual marca d'água foi aplicada (ou null) — usado pelo botão
+      // "Aplicar nas existentes" pra detectar fotos que precisam reprocessar.
       const fotoRows = urls.map((url, i) => ({
         imovel_id: imovelId!,
         url,
         ordem: ordemBase + i,
+        watermark_url_aplicada: watermarkUrl ?? null,
       }))
       await supabase.from('fotos_imoveis').insert(fotoRows)
     }
