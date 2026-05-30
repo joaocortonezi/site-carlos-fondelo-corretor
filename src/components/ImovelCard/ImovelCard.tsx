@@ -50,11 +50,12 @@ export default function ImovelCard({ imovel, size = 'default', watermarkUrl }: P
         <div className={styles.attrs}>
           {imovel.quartos  > 0 && <span className={styles.attr}><BedIcon />{imovel.quartos} quarto{imovel.quartos > 1 ? 's' : ''}</span>}
           {imovel.banheiros > 0 && <span className={styles.attr}><BathIcon />{imovel.banheiros} banheiro{imovel.banheiros > 1 ? 's' : ''}</span>}
-          {/* Card mostra apenas UMA área pra não poluir. Prioridade: construída > terreno > legado. */}
-          {(imovel.area_construida || imovel.area_terreno || imovel.area) && (
+          {/* Card mostra apenas UMA área pra não poluir. Cliente pediu prioridade
+              pra área do TERRENO. Fallback: construída → legado (compat imóveis antigos). */}
+          {(imovel.area_terreno || imovel.area_construida || imovel.area) && (
             <span className={styles.attr}>
               <AreaIcon />
-              {formatArea(imovel.area_construida ?? imovel.area_terreno ?? imovel.area!)}
+              {formatArea(imovel.area_terreno ?? imovel.area_construida ?? imovel.area!)}
             </span>
           )}
           {imovel.vagas    > 0 && <span className={styles.attr}><CarIcon />{imovel.vagas} vaga{imovel.vagas > 1 ? 's' : ''}</span>}

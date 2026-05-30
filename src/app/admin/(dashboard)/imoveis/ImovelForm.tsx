@@ -464,9 +464,6 @@ export default function ImovelForm({ imovel }: Props) {
           <Field label="Preço (R$)">
             <input type="number" className={styles.input} value={form.preco} onChange={e => set('preco', e.target.value)} placeholder="Ex: 350000" min="0" />
           </Field>
-          <Field label="Área útil (m²)">
-            <input type="number" className={styles.input} value={form.area} onChange={e => set('area', e.target.value)} placeholder="Ex: 75" min="0" />
-          </Field>
           <Field label="Área construída (m²)">
             <input type="number" className={styles.input} value={form.area_construida} onChange={e => set('area_construida', e.target.value)} placeholder="Ex: 120" min="0" />
           </Field>
