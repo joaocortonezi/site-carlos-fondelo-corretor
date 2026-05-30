@@ -75,8 +75,8 @@ export default function CaptacaoSection({ config }: Props) {
             <h2 className={styles.title}>
               {tituloLinha1}<br />{tituloLinha2}
             </h2>
-            <p className={styles.text}>{texto1}</p>
-            <p className={styles.text}>{texto2}</p>
+            <p className={styles.text} style={{ whiteSpace: 'pre-wrap' }}>{texto1}</p>
+            <p className={styles.text} style={{ whiteSpace: 'pre-wrap' }}>{texto2}</p>
           </motion.div>
 
           <motion.div

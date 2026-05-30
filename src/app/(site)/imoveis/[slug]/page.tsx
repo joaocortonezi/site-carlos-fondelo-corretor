@@ -85,7 +85,7 @@ export default async function ImovelPage({ params }: PageProps) {
 
                 <h1 className={styles.titulo}>{imovel.titulo}</h1>
                 {imovel.subtitulo && (
-                  <p className={styles.subtitulo}>{imovel.subtitulo}</p>
+                  <p className={styles.subtitulo} style={{ whiteSpace: 'pre-wrap' }}>{imovel.subtitulo}</p>
                 )}
                 <p className={styles.location}>
                   {[imovel.bairro, imovel.cidade, imovel.estado].filter(Boolean).join(' · ')}
@@ -97,15 +97,15 @@ export default async function ImovelPage({ params }: PageProps) {
                   {imovel.banheiros > 0 && <AttrItem label="Banheiros" value={String(imovel.banheiros)} />}
                   {imovel.area_construida && <AttrItem label="Área construída" value={formatArea(imovel.area_construida)} />}
                   {imovel.area_terreno    && <AttrItem label="Área do terreno" value={formatArea(imovel.area_terreno)} />}
-                  {/* Fallback: mostra "Área" geral apenas quando nenhuma específica foi preenchida (compat com imóveis antigos) */}
-                  {imovel.area && !imovel.area_construida && !imovel.area_terreno && <AttrItem label="Área" value={formatArea(imovel.area)} />}
                   {imovel.vagas     > 0 && <AttrItem label="Vagas"     value={String(imovel.vagas)} />}
                 </div>
 
                 {imovel.descricao && (
                   <div className={styles.descricao}>
                     <h2 className={styles.secTitle}>Descrição</h2>
-                    <p>{imovel.descricao}</p>
+                    {/* whiteSpace: pre-wrap respeita quebras de linha e espaços que
+                        o admin digitou no textarea (sem quebrar o auto-wrap normal). */}
+                    <p style={{ whiteSpace: 'pre-wrap' }}>{imovel.descricao}</p>
                   </div>
                 )}
 

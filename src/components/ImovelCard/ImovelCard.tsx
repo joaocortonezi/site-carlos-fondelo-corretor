@@ -51,11 +51,13 @@ export default function ImovelCard({ imovel, size = 'default', watermarkUrl }: P
           {imovel.quartos  > 0 && <span className={styles.attr}><BedIcon />{imovel.quartos} quarto{imovel.quartos > 1 ? 's' : ''}</span>}
           {imovel.banheiros > 0 && <span className={styles.attr}><BathIcon />{imovel.banheiros} banheiro{imovel.banheiros > 1 ? 's' : ''}</span>}
           {/* Card mostra apenas UMA área pra não poluir. Cliente pediu prioridade
-              pra área do TERRENO. Fallback: construída → legado (compat imóveis antigos). */}
-          {(imovel.area_terreno || imovel.area_construida || imovel.area) && (
+              pra área do TERRENO; cai pra construída quando não tem. Imóveis antigos
+              só com o campo legado `area` preenchido NÃO aparecem mais — decisão
+              do cliente em 30/05/2026. */}
+          {(imovel.area_terreno || imovel.area_construida) && (
             <span className={styles.attr}>
               <AreaIcon />
-              {formatArea(imovel.area_terreno ?? imovel.area_construida ?? imovel.area!)}
+              {formatArea(imovel.area_terreno ?? imovel.area_construida!)}
             </span>
           )}
           {imovel.vagas    > 0 && <span className={styles.attr}><CarIcon />{imovel.vagas} vaga{imovel.vagas > 1 ? 's' : ''}</span>}

@@ -102,8 +102,8 @@ export default function About({ perfil }: Props) {
             <h2 className={styles.name}>{nome}</h2>
             <p className={styles.creci}>Corretor de Imóveis · CRECI {creci}</p>
 
-            <p className={styles.text}>{bio1}</p>
-            <p className={styles.text}>{bio2}</p>
+            <p className={styles.text} style={{ whiteSpace: 'pre-wrap' }}>{bio1}</p>
+            <p className={styles.text} style={{ whiteSpace: 'pre-wrap' }}>{bio2}</p>
 
             {visibleCount > 0 && (
               <div className={styles.stats} data-cols={visibleCount}>
