@@ -32,9 +32,6 @@ export default function HighEnd({ imoveis, watermarkUrl }: Props) {
             <h2 className={styles.title}>Imóveis de Alto Padrão</h2>
             <p className={styles.sub}>Selecionados · acima de R$ 900k</p>
           </div>
-          <motion.div whileHover={{ x: 4 }}>
-            <Link href="/imoveis?alto_padrao=true" className={styles.verMais}>Ver Mais →</Link>
-          </motion.div>
         </motion.div>
 
         <div className={styles.grid}>
@@ -65,6 +62,20 @@ export default function HighEnd({ imoveis, watermarkUrl }: Props) {
             </div>
           )}
         </div>
+
+        {/* CTA no fim da seção */}
+        <motion.div
+          className={styles.ctaWrap}
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-40px' }}
+        >
+          <Link href="/imoveis?alto_padrao=true" className={styles.cta}>
+            Ver imóveis de alto padrão
+            <span className={styles.ctaArrow} aria-hidden>→</span>
+          </Link>
+        </motion.div>
       </div>
     </section>
   )

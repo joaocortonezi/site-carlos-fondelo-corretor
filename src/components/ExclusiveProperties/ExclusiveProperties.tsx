@@ -32,9 +32,6 @@ export default function ExclusiveProperties({ imoveis, watermarkUrl }: Props) {
             <h2 className={styles.title}>Imóveis Exclusivos</h2>
             <p className={styles.sub}>Captações próprias do corretor</p>
           </div>
-          <motion.div whileHover={{ x: 4 }}>
-            <Link href="/imoveis?exclusivo=true" className={styles.verTodos}>Ver todos os imóveis exclusivos →</Link>
-          </motion.div>
         </motion.div>
 
         <div className={styles.grid}>
@@ -65,6 +62,20 @@ export default function ExclusiveProperties({ imoveis, watermarkUrl }: Props) {
             </div>
           )}
         </div>
+
+        {/* CTA no fim da seção */}
+        <motion.div
+          className={styles.ctaWrap}
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-40px' }}
+        >
+          <Link href="/imoveis?exclusivo=true" className={styles.cta}>
+            Ver todos os imóveis exclusivos
+            <span className={styles.ctaArrow} aria-hidden>→</span>
+          </Link>
+        </motion.div>
       </div>
     </section>
   )

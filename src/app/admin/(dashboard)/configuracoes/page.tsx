@@ -12,7 +12,6 @@ export default function ConfiguracoesPage() {
   const [uploading,    setUploading]    = useState(false)
   const [saved,        setSaved]        = useState(false)
   const [error,        setError]        = useState('')
-  const [bakedCount,   setBakedCount]   = useState<number>(0)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const supabase = createBrowserClient(
@@ -29,14 +28,6 @@ export default function ConfiguracoesPage() {
       .then(({ data }) => {
         if (data?.valor) setWatermarkUrl(data.valor)
       })
-    // Conta quantas fotos antigas têm watermark queimada nos pixels — essas
-    // não recebem overlay (pra evitar marca duplicada) e só somem se o Carlos
-    // re-subir cada uma manualmente.
-    supabase
-      .from('fotos_imoveis')
-      .select('id', { count: 'exact', head: true })
-      .not('watermark_url_aplicada', 'is', null)
-      .then(({ count }) => setBakedCount(count ?? 0))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -159,25 +150,6 @@ export default function ConfiguracoesPage() {
         >
           {uploading ? 'Salvando…' : 'Salvar configurações'}
         </button>
-
-        {bakedCount > 0 && (
-          <div style={{
-            marginTop:     '1.5rem',
-            padding:       '0.9rem 1rem',
-            background:    'var(--form-error-bg, #fff7e6)',
-            border:        '1px solid var(--form-error-border, #ffd591)',
-            borderRadius:  '6px',
-            fontSize:      '0.8rem',
-            color:         'var(--admin-text-2)',
-            lineHeight:    1.5,
-          }}>
-            <strong>⚠ Atenção:</strong> existem <strong>{bakedCount} foto{bakedCount > 1 ? 's' : ''}</strong> antiga{bakedCount > 1 ? 's' : ''} com
-            marca d'água queimada diretamente nos pixels (de uma aplicação anterior).
-            Pra essas fotos, o overlay não é aplicado (pra não ficar marca duplicada) e
-            ligar/desligar a watermark aqui não afeta elas.
-            Pra deixá-las limpas, abra cada imóvel e re-suba as fotos originais.
-          </div>
-        )}
       </section>
     </div>
   )

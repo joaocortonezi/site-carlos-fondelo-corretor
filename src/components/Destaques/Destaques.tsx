@@ -30,9 +30,6 @@ export default function Destaques({ imoveis, watermarkUrl }: Props) {
             <h2 className={styles.title}>Imóveis em Destaque</h2>
             <p className={styles.sub}>Selecionados especialmente para você</p>
           </div>
-          <motion.div whileHover={{ x: 4 }}>
-            <Link href="/imoveis" className={styles.verTodos}>Ver todos os imóveis →</Link>
-          </motion.div>
         </motion.div>
 
         <div className={styles.grid}>
@@ -49,6 +46,20 @@ export default function Destaques({ imoveis, watermarkUrl }: Props) {
             </motion.div>
           ))}
         </div>
+
+        {/* CTA no fim da seção — botão destacado pra conduzir o usuário à listagem completa */}
+        <motion.div
+          className={styles.ctaWrap}
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-40px' }}
+        >
+          <Link href="/imoveis" className={styles.cta}>
+            Ver todos os imóveis
+            <span className={styles.ctaArrow} aria-hidden>→</span>
+          </Link>
+        </motion.div>
       </div>
     </section>
   )
